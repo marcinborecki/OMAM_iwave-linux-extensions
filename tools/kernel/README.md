@@ -5,6 +5,13 @@ Connect Hub G62H i.MX91 REL3.3 profile. They require Python 3.11 or later. No OM
 application checkout, installer or private profile is imported. All source, toolchain,
 work, receipt and output paths are explicit. They do not contact or flash a device.
 
+The output is the hardware-enabling Linux layer consumed by an image builder.
+FlexCAN control lets an application select relevant identifiers from intensive CAN
+traffic; the charger patch places one explicit BATFET operation at orderly shutdown;
+the upstream IMU pair reuses the IRQ mapping during its driver handoff. Vehicle
+interpretation, sample/energy policy and service communication belong to the
+application above these interfaces. Linux still owns CPU, memory and driver work.
+
 ## Source preparation
 
 `apply.py` validates `components/flexcan-controller-policy/manifest.json`, every

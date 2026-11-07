@@ -5,9 +5,16 @@ NXP i.MX91 and `imx91-iwg62h-prgtt.dtb`. It does not establish compatibility wit
 all G62H production options or other iWave products. REL3.3 identifies this board's
 vendor BSP release, not a common firmware version for the manufacturer's catalogue.
 
+This is the operating-system profile beneath a downstream application. Linux
+manages CPU, memory, storage and drivers; base services retain their configured
+platform roles, including factory battery protection. A separate application
+chooses vehicle decoding, capture/sample policy, operational energy decisions and
+its service connection through the provided interfaces.
+
 The current qualified set uses Linux `6.12.34-omam-rel33-policy1` and .NET SDK
 `11.0.100-rc.3.26522.148` for Linux ARM64. The SDK and runtime are deliberately pinned
-to the existing RC3 payload. This is not a statement that RC3 is the latest release.
+to the existing RC3 payload. Official .NET 11 channel metadata checked on 2026-11-07 identifies RC3 as
+the latest published RC at that check; sdk-release-verification.json records it.
 `dotnet-sdk.lock.json` records the Microsoft download URL and SHA512;
 `image-policy.json` binds the actual SDK tree and qualified kernel manifest.
 The historical `omam` kernel release suffix and module/UAPI names identify stable
@@ -36,6 +43,17 @@ The ST LSM6DSX change handles an existing IRQ mapping when switching from the
 vendor sensor driver. It is specific to the reviewed interrupt topology and is
 not a claim that every ST IMU or every Device Tree is supported. Installing the
 qualified modules does not prove an actual driver handoff or sensor readback.
+
+## Mechanisms and application activation
+
+| Area | Platform capability in this profile | Application role |
+|---|---|---|
+| CAN | Patched built-in FlexCAN accepts a complete, observable controller policy. | Choose the identifiers/masks that matter on a busy bus and retain exact decoding/filtering. |
+| Motion | Built-in vendor IMU driver plus an externally built upstream pair with the IRQ-handoff fix. | Select the owner, channels and a supported rate such as104Hz, then interpret XYZ samples. |
+| Power | Linux idle/suspend infrastructure, factory protection and controlled BQ25601 shutdown intent. | Coordinate work/flush, choose a supported state, prepare wake or external-power recovery, and observe the result. |
+
+This profile binds those mechanisms to the actual kernel, module and SDK identities.
+The runtime application uses their interfaces to implement its operational policy.
 
 ## Deliberate neutralisation
 

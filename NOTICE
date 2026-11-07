@@ -18,7 +18,7 @@ The public source tree contains no OMAM application, SIM/APN settings, device
 credentials, service authority or private deployment profile. Kernel identifiers
 such as omam_flexcan are stable interfaces and are preserved for compatibility.
 
-A local base-image candidate is not a redistribution clearance. The five retained
+The current public deliverable is a source release. Complete base images remain local. The five retained
 external modules still need complete matching-source evidence, and vendor
 proprietary libraries/firmware need their applicable redistribution terms. Until
 those are resolved, generated firmware archives remain local and are not attached

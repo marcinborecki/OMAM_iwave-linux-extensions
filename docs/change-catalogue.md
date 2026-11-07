@@ -48,6 +48,14 @@ notices and licensing remain with the patch/source files.
 
 ## FlexCAN ownership, validation and observed state
 
+A busy vehicle bus can deliver thousands of frames per second while an application
+needs a small identifier subset. For illustration, 3,000 frames/s on the wire and
+60 frames/s for the chosen interests explain why selecting acceptance in the
+controller can save host receive/decoding work. Exact effects are measured for the
+traffic and representable masks. The physical CAN traffic retains its original
+rate, and the application performs exact interpretation after controller admission.
+
+
 The extension exposes Generic Netlink family `omam_flexcan`, ABI version 1. The
 CAN data path remains SocketCAN. Its request is exactly 1128 bytes; its response
 is 1168 bytes. Fields are little-endian, reserved/unused bytes are zero, and there

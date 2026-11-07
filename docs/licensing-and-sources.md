@@ -92,8 +92,9 @@ metadata. This is an inspection result, not a determination of the full vendor
 contract. Redistribution rights remain unconfirmed.
 
 This is not a reason to remove the factory monitor from a local image and silently
-lose its protection path. It is a reason to keep that image local until the terms
-and required source mappings are resolved. Neither library is part of the public
+lose its protection path. The project currently keeps images containing that library local while its
+redistribution terms and the recorded source mappings remain unresolved.
+The separately licensed kernel source is already published. Neither library is part of the public
 Git source export or source-only release.
 
 ## Release contents
