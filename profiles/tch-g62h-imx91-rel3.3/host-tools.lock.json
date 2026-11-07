@@ -1,0 +1,19 @@
+{
+  "schema": "iwave.host-tools.v1",
+  "release": "uuu_1.5.243",
+  "source": "https://github.com/nxp-imx/mfgtools/releases/tag/uuu_1.5.243",
+  "tools": {
+    "uuu": {
+      "host_rid": "linux-arm64",
+      "url": "https://github.com/nxp-imx/mfgtools/releases/download/uuu_1.5.243/uuu_aarch64",
+      "bytes": 8323344,
+      "sha256": "d57389225fced3b5307fb003e19d5eb6c252b51c9b92e8cc68b95b1b173b604d"
+    },
+    "uuu-x86_64": {
+      "host_rid": "linux-x64",
+      "url": "https://github.com/nxp-imx/mfgtools/releases/download/uuu_1.5.243/uuu-ubuntu20.04",
+      "bytes": 6852648,
+      "sha256": "09302f90c65e8f21c12e8c2bb6ae84d3a0160fdb63f973bb434af8800b829c15"
+    }
+  }
+}

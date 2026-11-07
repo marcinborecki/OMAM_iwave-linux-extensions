@@ -516,8 +516,14 @@ sudo apt-get install uuu usbutils minicom
 ```
 
 [UUU is the NXP Universal Update Utility](https://github.com/nxp-imx/mfgtools).
-Use a host binary for the computer's architecture. A VM must receive the device's
-USB connection through the boot/recovery re-enumerations. The actual flash bundle
+Use a host binary for the computer's architecture. The profile also records exact
+NXP UUU 1.5.243 release URLs, sizes and SHA-256 hashes in
+`profiles/tch-g62h-imx91-rel3.3/host-tools.lock.json`, for Linux ARM64 and x86-64.
+A downstream bundle builder can acquire and verify those utilities directly from
+NXP; it does not need to recover a utility from an older device image. These are
+host-side flashing tools, separate from the firmware installed on the unit.
+
+A VM must receive the device's USB connection through the boot/recovery re-enumerations. The actual flash bundle
 contains these relative paths:
 
 ```text
