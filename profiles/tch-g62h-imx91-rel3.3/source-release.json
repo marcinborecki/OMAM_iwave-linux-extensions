@@ -1,0 +1,31 @@
+{
+  "schema": "iwave.source-release.v1",
+  "tag": "v0.1.0-source-only",
+  "source_snapshot_commit": "1ca0d4fba6d6e94dec0f180b2d5f6476cd384640",
+  "archive": {
+    "name": "kernel-core-6.12.34-tch-rel33.tar.zst",
+    "url": "https://github.com/marcinborecki/OMAM_iwave-linux-extensions/releases/download/v0.1.0-source-only/kernel-core-6.12.34-tch-rel33.tar.zst",
+    "bytes": 230766173,
+    "sha256": "a249c8e3930d91b0e06ff9a35fcd90fd1ce14159e70707a0347346ae99f0522f"
+  },
+  "validation": {
+    "status": "PASS_ALL_MANIFEST_ENTRIES",
+    "verified_manifest_entries": 89123,
+    "linux_files": 89045,
+    "public_support_files": 76
+  },
+  "kernel_release": "6.12.34-omam-rel33-policy1",
+  "kernel_image_sha256": "2077497c2a013217b70bbdde3afa0a680c42cdb9eb3c572a9ca1d698ddec86b8",
+  "kernel_config_sha256": "77a020fd339b28333113bd317e62286ce5b9073460ed905eff5bb16b22d37920",
+  "scope": "Actual preferred modified kernel-core sources, upstream IMU sources and patch/recipe, public extensions, qualified config, notices and per-file manifest",
+  "completeness": "INCOMPLETE_FOR_FIVE_RETAINED_FACTORY_MODULES",
+  "excluded_factory_modules": [
+    "cryptodev.ko",
+    "igb_uio.ko",
+    "kpage_ncache.ko",
+    "mlan.ko",
+    "moal.ko"
+  ],
+  "firmware_binaries": "NOT_PUBLISHED; source correspondence and vendor redistribution terms unresolved",
+  "physical_acceptance": "NOT_RUN"
+}
