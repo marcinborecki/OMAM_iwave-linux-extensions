@@ -95,6 +95,11 @@ profile rather than inferring compatibility from a filename or a generic “REL3
 From the repository root, the existing public validator can check a supplied neutral
 base directory without contacting hardware:
 
+For a separately rebuilt candidate, supply the explicitly trusted local policy
+created by `tools/image/qualify_profile.py` as `policy_path=Path(...)` to
+`validate_base`. The default call below selects the maintained release profile;
+it does not automatically trust a policy supplied by an image itself.
+
 ```sh
 PYTHONPATH=tools/image python3 - /absolute/path/to/neutral-base <<'PY'
 from pathlib import Path

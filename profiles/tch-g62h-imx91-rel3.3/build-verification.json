@@ -1,0 +1,86 @@
+{
+  "schema": "iwave.core-and-image-verification.v1",
+  "as_of": "2026-11-07",
+  "profile": "tch-g62h-imx91-rel3.3",
+  "release_tag": "v0.2.0-kernel-core",
+  "scope": "Fresh source rebuild, qualified GPL core delivery and compiler-free assembly with an independently supplied exact BSP",
+  "executed_host": {
+    "architecture": "aarch64",
+    "system": "Ubuntu 26.04 LTS",
+    "x86_64_execution": "NOT_RUN; assembly tools do not execute target binaries"
+  },
+  "kernel": {
+    "release": "6.12.34-iwave-rel33-policy1",
+    "status": "PASS_BUILD_AND_STATIC_ABI",
+    "manifest_sha256": "52e531ee35b78cc60f67841ccee309af28ff8dcbc98fd0f5f71203f5e9efe5db",
+    "outputs": {
+      "Image": {
+        "bytes": 35600896,
+        "sha256": "5162245fafbaa0f0740e679840d270c6180f91ea39fcd7760375f239e131e4b8"
+      },
+      "imx91-iwg62h-prgtt.dtb": {
+        "bytes": 36118,
+        "sha256": "8618139cc10e942d9863903ea87b9247c2e009e702f1e425414f4afab86e9bb2"
+      },
+      "config": {
+        "bytes": 257224,
+        "sha256": "77a020fd339b28333113bd317e62286ce5b9073460ed905eff5bb16b22d37920"
+      },
+      "Module.symvers": {
+        "bytes": 1146533,
+        "sha256": "5c1bc72d9c38c735a2caa1fa4bba6a6d2feea6625b84115cd66b85b9e82e23ef"
+      },
+      "System.map": {
+        "bytes": 5551907,
+        "sha256": "6769855e8972f127fa6cfbd3ae2cbe3736e910757911c188d62a09a79909e9e9"
+      },
+      "module-symbols.symvers": {
+        "bytes": 1191013,
+        "sha256": "233d7f2be3d15d44b2595e07a46a897a746e995f201d72675fe7ff04d9e5af76"
+      }
+    },
+    "native_modules": 807,
+    "factory_modules": 5,
+    "imu_modules": 2,
+    "total_modules": 814,
+    "image_exports": 16967,
+    "versioned_imports_checked": 26203,
+    "work_removed": true
+  },
+  "public_delivery": {
+    "archive_sha256": "5147427e157d86b10421584452b74d82850c2fa112467efa1358d2269785d851",
+    "archive_bytes": 27160373,
+    "delivered_modules": 809,
+    "omitted_factory_modules": 5,
+    "verified_payload_files": 836,
+    "private_data_findings": 0,
+    "source_archive_sha256": "a249c8e3930d91b0e06ff9a35fcd90fd1ce14159e70707a0347346ae99f0522f",
+    "source_manifest_sha256": "11d819b4da74eff7ed8cd81517c739d20f08cf69c42b1364fab4e5608a920d9e"
+  },
+  "local_image_acceptance": {
+    "status": "PASS_PUBLIC_CORE_BSP_TO_NEUTRAL_AND_PRIVATE_BRIDGE",
+    "rootfs_sha256": "f06efd187b706a372c6780ad80728c8a67e85445189fb69f3fa822a9c86c6321",
+    "base_manifest_sha256": "4d253f3e513ad7911fb5064e0dff7217f6fe92c5bdb7233559a8f5734e3c06fc",
+    "image_policy_sha256": "c430999078f6e1ddc6fa63142526726dea0f7b7faf7e3d33fd1206330af2797a",
+    "sdk_version": "11.0.100-rc.3.26522.148",
+    "runtime_version": "11.0.0-rc.3.26522.148",
+    "sdk_tree_sha256": "fdd2e5694cff09a503cbc48373b8056826835a0d0db1f3517a0da7882927cd3e",
+    "compiler_required_for_core_restoration": false,
+    "proof_image_retained": false,
+    "maintained_default_base_changed": false
+  },
+  "python_tests": {
+    "public_executed": 183,
+    "private_consumer_executed": 464,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "physical_acceptance": {
+    "boot": "NOT_RUN",
+    "can_traffic": "NOT_RUN",
+    "motion_sampling": "NOT_RUN",
+    "power_and_wake": "NOT_RUN"
+  },
+  "full_firmware_distribution": "NOT_PUBLISHED; independent BSP component terms and complete-image source coverage remain unresolved"
+}

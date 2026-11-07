@@ -1,0 +1,53 @@
+{
+  "schema": "iwave.vendor-files.v1",
+  "profile": "tch-g62h-imx91-rel3.3",
+  "archive_sha256": "a1ccde9b961bfbfe1a7e4efa8da75eab6342d7b8b0723e9dd28d6032a5893d43",
+  "root_directory": "iG-PRGTT-BN-R2.0-REL3.3_Telematics_Connect_Hub",
+  "files": {
+    "Firmware/Image_uuu": {
+      "bytes": 35633664,
+      "sha256": "64ef37944a9d36ea55c0702f53290c7ed04e3616c7eab3740b969402738fc668",
+      "member": "iG-PRGTT-BN-R2.0-REL3.3_Telematics_Connect_Hub/Firmware/Image_uuu"
+    },
+    "Firmware/flash_uuu.bin": {
+      "bytes": 1475584,
+      "sha256": "3e7d44b0c5ac2092714b051c194fd374c10af162fb71ae4269f254d48905e135",
+      "member": "iG-PRGTT-BN-R2.0-REL3.3_Telematics_Connect_Hub/Firmware/flash_uuu.bin"
+    },
+    "Firmware/imx91-iwg50m-prgjj_uuu.dtb": {
+      "bytes": 40378,
+      "sha256": "e7072e65a5e9b2bef003dd4f522a4e49d09d2c8697141e9b187148c3dc11a3a5",
+      "member": "iG-PRGTT-BN-R2.0-REL3.3_Telematics_Connect_Hub/Firmware/imx91-iwg50m-prgjj_uuu.dtb"
+    },
+    "Firmware/initramfs.cpio.zst.u-boot": {
+      "bytes": 13012440,
+      "sha256": "803ff8511a47175d1c46f35b84a7ea19837adb85c4ce66b70f9cb5746516a3d4",
+      "member": "iG-PRGTT-BN-R2.0-REL3.3_Telematics_Connect_Hub/Firmware/initramfs.cpio.zst.u-boot"
+    },
+    "Linux/Image": {
+      "bytes": 35598848,
+      "sha256": "e8b808c8625f08a572b71b0c2440c1b2515652569d5a63df865f3642cbc0c8f1",
+      "member": "iG-PRGTT-BN-R2.0-REL3.3_Telematics_Connect_Hub/Linux/Image"
+    },
+    "Linux/flash.bin": {
+      "bytes": 2012160,
+      "sha256": "47a3c78d60680ed766b8c8bdbb64f48f4945e2edbabb85c9fa339f97584dda3c",
+      "member": "iG-PRGTT-BN-R2.0-REL3.3_Telematics_Connect_Hub/Linux/flash.bin"
+    },
+    "Linux/imx91-iwg62h-prgtt.dtb": {
+      "bytes": 36118,
+      "sha256": "8618139cc10e942d9863903ea87b9247c2e009e702f1e425414f4afab86e9bb2",
+      "member": "iG-PRGTT-BN-R2.0-REL3.3_Telematics_Connect_Hub/Linux/imx91-iwg62h-prgtt.dtb"
+    },
+    "Linux/rootfs.tar.zst": {
+      "bytes": 1322170532,
+      "sha256": "4812a431aa677c6cdafe47a1e429902ecd15b8200ab47dd05bf4d23334c16d98",
+      "member": "iG-PRGTT-BN-R2.0-REL3.3_Telematics_Connect_Hub/Linux/rootfs.tar.zst"
+    },
+    "iG-PRGTT-TelematicsConnectHub.uuu": {
+      "bytes": 2617,
+      "sha256": "96f6135a66d70777f9b8859a35fc427bd80fdc1f21d8eb586a20e94d70b50d38",
+      "member": "iG-PRGTT-BN-R2.0-REL3.3_Telematics_Connect_Hub/iG-PRGTT-TelematicsConnectHub.uuu"
+    }
+  }
+}

@@ -5,57 +5,67 @@
     {
       "module": "cryptodev.ko",
       "sha256": "0041b731cfaff262bb20dded6d839d04f796c45e259e0d7d0c4d8f7361101c09",
-      "source_status": "public candidate source and pinned recipe identified; correspondence to factory binary not verified",
+      "source_status": "PUBLIC_GPL_CANDIDATE_IDENTIFIED; actual factory build-source mapping UNKNOWN",
       "binary_distribution": "not included in public Git or source-only release",
       "candidate_source": "cryptodev",
       "package_oe": "cryptodev-module",
-      "package_version": "1.14-r0"
+      "package_version": "1.14-r0",
+      "actual_additional_vendor_patches": "UNKNOWN; none proved missing by this inspection",
+      "source_correspondence_action": "Identify effective source/recipe/configuration and required generated/staged inputs; obtain actual patches if used or affirmative no-extra-change confirmation. Exact binary-hash reproduction is not required by GPL."
     },
     {
       "module": "igb_uio.ko",
       "sha256": "2e51d07348d7aa5b79ca519b6f83137fe782990bd5ccf2ee4926822408457dfa",
-      "source_status": "public candidate source and pinned recipe identified; correspondence to factory binary not verified",
+      "source_status": "PUBLIC_GPL_CANDIDATE_IDENTIFIED; actual factory build-source mapping UNKNOWN",
       "binary_distribution": "not included in public Git or source-only release",
       "candidate_source": "dpdk-extras",
       "package_oe": "kernel-module-dpdk-extras",
-      "package_version": "git-r0"
+      "package_version": "git-r0",
+      "actual_additional_vendor_patches": "UNKNOWN; none proved missing by this inspection",
+      "source_correspondence_action": "Identify effective source/recipe/configuration and required generated/staged inputs; obtain actual patches if used or affirmative no-extra-change confirmation. Exact binary-hash reproduction is not required by GPL."
     },
     {
       "module": "kpage_ncache.ko",
       "sha256": "a34a0b8ecc864077e1a10fd40ae5dc1fc462ceb141f6f5a62979911a8bab6fda",
-      "source_status": "public candidate source and pinned recipe identified; correspondence to factory binary not verified",
+      "source_status": "PUBLIC_GPL_CANDIDATE_IDENTIFIED; actual factory build-source mapping UNKNOWN",
       "binary_distribution": "not included in public Git or source-only release",
       "candidate_source": "dpdk-extras",
       "package_oe": "kernel-module-dpdk-extras",
-      "package_version": "git-r0"
+      "package_version": "git-r0",
+      "actual_additional_vendor_patches": "UNKNOWN; none proved missing by this inspection",
+      "source_correspondence_action": "Identify effective source/recipe/configuration and required generated/staged inputs; obtain actual patches if used or affirmative no-extra-change confirmation. Exact binary-hash reproduction is not required by GPL."
     },
     {
       "module": "mlan.ko",
       "sha256": "134d3bc084bb5cab675fd7e1abed8536ac421e164f2952cbad28ceadd33a66fc",
-      "source_status": "public candidate source and pinned recipe identified; correspondence to factory binary not verified",
+      "source_status": "PUBLIC_GPL_CANDIDATE_IDENTIFIED; actual factory build-source mapping UNKNOWN",
       "binary_distribution": "not included in public Git or source-only release",
       "candidate_source": "nxp-wlan",
       "package_oe": "kernel-module-nxp-wlan",
       "package_version": "git-r0",
       "module_version": "540.p7",
-      "module_srcversion": "0C4C1DDD98BA0614E8EFEAD"
+      "module_srcversion": "0C4C1DDD98BA0614E8EFEAD",
+      "actual_additional_vendor_patches": "UNKNOWN; none proved missing by this inspection",
+      "source_correspondence_action": "Identify effective source/recipe/configuration and required generated/staged inputs; obtain actual patches if used or affirmative no-extra-change confirmation. Exact binary-hash reproduction is not required by GPL."
     },
     {
       "module": "moal.ko",
       "sha256": "053ac7490b0d5d0f52479256be200c94568b5eb08886ad54d24b33c3731bd7a0",
-      "source_status": "public candidate source and pinned recipe identified; correspondence to factory binary not verified",
+      "source_status": "PUBLIC_GPL_CANDIDATE_IDENTIFIED; actual factory build-source mapping UNKNOWN",
       "binary_distribution": "not included in public Git or source-only release",
       "candidate_source": "nxp-wlan",
       "package_oe": "kernel-module-nxp-wlan",
       "package_version": "git-r0",
       "module_version": "540.p7",
-      "module_srcversion": "3F3831B352F67ECFA142402"
+      "module_srcversion": "3F3831B352F67ECFA142402",
+      "actual_additional_vendor_patches": "UNKNOWN; none proved missing by this inspection",
+      "source_correspondence_action": "Identify effective source/recipe/configuration and required generated/staged inputs; obtain actual patches if used or affirmative no-extra-change confirmation. Exact binary-hash reproduction is not required by GPL."
     }
   ],
   "vendor_runtime_terms": {
     "library": "libTelematics.so",
     "headers": "vendor API headers",
-    "redistribution": "unconfirmed; no vendor binary is in public Git",
+    "redistribution": "UNKNOWN from inspected material; neither a public redistribution grant nor a prohibition established for the intended image channel",
     "inspected_library_variants": [
       {
         "location": "stock rootfs usr/lib/libTelematics.so",
@@ -67,9 +77,11 @@
         "sha256": "57c950f2e7163cd3ed48e816f3a2b84d098603f41568bcd65fa7ae8d2d01ed61"
       }
     ],
-    "inspection_scope": "Inspected supplied API headers and bounded named rootfs package/license metadata. No public redistribution grant or matching Telematics package/license was found in that scope. Absence in this inspection does not establish the complete contractual terms."
+    "inspection_scope": "Prior bounded stock-rootfs package/license inspection reused. Fresh 2026-11-07 inspection verified the separate library hash and ten supplied API headers; no license/SPDX/redistribution notice or separate LICENSE/COPYING/EULA/NOTICE file in that supplied library directory. Full contract terms and package-by-package rootfs licenses not established; no whole rootfs extraction performed.",
+    "restriction_established_in_scope": false,
+    "next_action": "Request the existing applicable terms for each library/header variant and apply their conditions; seek an extra grant only where the intended use is not already covered."
   },
-  "firmware_release": "blocked until source and rights gates close",
+  "firmware_release": "Complete-image distribution not yet accepted by this project because component-specific source and independent binary-license evidence is incomplete; UNKNOWN is not a finding of prohibition.",
   "candidate_source_evidence": {
     "status": "candidate only; not accepted as verified corresponding source",
     "rootfs_sha256": "4812a431aa677c6cdafe47a1e429902ecd15b8200ab47dd05bf4d23334c16d98",
@@ -85,7 +97,7 @@
       "meta_imx_tag": "rel_imx_6.12.34_2.1.0",
       "meta_iwave_revision": "de7f19bdecbb257f20551aec3a0c6d16575253fe"
     },
-    "remaining_gap": "Confirm actual vendor build inputs, local patches, generated/staged inputs and configuration against the five recorded factory module hashes. Package names, versions, SPDX and loader compatibility alone do not establish correspondence."
+    "remaining_gap": "Actual factory build-source mapping, effective recipe/appends, whether extra changes exist and required generated/staged/configuration inputs are UNKNOWN. The five factory hashes identify binaries; bit-identical reproduction is not a GPL condition."
   },
   "candidate_sources": {
     "cryptodev": {
@@ -97,7 +109,9 @@
       "license_declared_by_recipe": "GPL-2.0-only",
       "recipe_url": "https://github.com/yoctoproject/poky/blob/b642d6a4a93a23d5b99886844ff7b224aa7e13bf/meta/recipes-kernel/cryptodev/cryptodev-module_1.14.bb",
       "source_pin_url": "https://github.com/yoctoproject/poky/blob/b642d6a4a93a23d5b99886844ff7b224aa7e13bf/meta/recipes-kernel/cryptodev/cryptodev.inc",
-      "qualification_note": "The NXP RSA bbappend is named cryptodev-linux_1.14.bbappend, not cryptodev-module_1.14.bbappend. Do not assume it patches cryptodev.ko; verify the actual module and staged-header inputs."
+      "qualification_note": "The NXP RSA bbappend is named cryptodev-linux_1.14.bbappend, not cryptodev-module_1.14.bbappend. Do not assume it patches cryptodev.ko; verify the actual module and staged-header inputs.",
+      "source_license_text_url": "https://github.com/cryptodev-linux/cryptodev-linux/blob/135cbff90af2ba97d88f1472be595ce78721972c/COPYING",
+      "public_candidate_license_evidence": "GPL version 2 text and recipe declaration inspected at the recorded source revision; this is distinct from factory build correspondence."
     },
     "dpdk-extras": {
       "recipe": "kernel-module-dpdk-extras",
@@ -107,7 +121,9 @@
       "branch": "main",
       "license_declared_by_recipe": "GPL-2.0-only",
       "recipe_url": "https://github.com/nxp-imx/meta-imx/blob/rel_imx_6.12.34_2.1.0/meta-imx-bsp/recipes-kernel/kernel-modules/kernel-module-dpdk-extras_git.bb",
-      "qualification_note": "kpage_ncache.c declares SPDX GPL-2.0, although its MODULE_LICENSE reports Dual BSD/GPL. Preserve the file license and notices."
+      "qualification_note": "kpage_ncache.c declares SPDX GPL-2.0, although its MODULE_LICENSE reports Dual BSD/GPL. Preserve the file license and notices.",
+      "source_license_text_url": "https://github.com/nxp-qoriq/dpdk-extras/blob/e9e32e999c3c0d6b3edead9ad51746e900572f75/LICENSE",
+      "public_candidate_license_evidence": "GPL version 2 text and recipe declaration inspected at the recorded source revision; this is distinct from factory build correspondence."
     },
     "nxp-wlan": {
       "recipe": "kernel-module-nxp-wlan",
@@ -118,7 +134,36 @@
       "license_declared_by_recipe": "GPL-2.0-only",
       "recipe_url": "https://github.com/Freescale/meta-freescale/blob/167ff4ddb79299cf5477e94620a9e598659c407b/recipes-kernel/kernel-modules/kernel-module-nxp-wlan_git.bb",
       "source_pin_url": "https://github.com/nxp-imx/meta-imx/blob/rel_imx_6.12.34_2.1.0/meta-imx-bsp/recipes-kernel/kernel-modules/kernel-module-nxp-wlan_git.bbappend",
-      "qualification_note": "The NXP bbappend replaces the base recipe SRC_URI, branch and revision. Candidate Makefile declares 540.p7, matching the binaries; version equality does not verify corresponding source."
+      "qualification_note": "The NXP bbappend replaces the base recipe SRC_URI, branch and revision. Candidate Makefile declares 540.p7, matching the binaries; version equality does not verify corresponding source.",
+      "source_license_text_url": "https://github.com/nxp-imx/mwifiex/blob/1e1f69bf38369807443e8f567cac63e26fe80881/LICENSE",
+      "public_candidate_license_evidence": "GPL version 2 text and recipe declaration inspected at the recorded source revision; this is distinct from factory build correspondence."
     }
-  }
+  },
+  "assessment_as_of": "2026-11-07",
+  "assessment_scope": "Scoped source/rights evidence for the existing kernel set and complete-image release inventory; not a full rootfs license audit.",
+  "gpl_interpretation": {
+    "additional_iwave_permission_for_gpl_rights_required": false,
+    "bit_identical_rebuild_required_by_gpl": false,
+    "source_requirement": "Preferred editable source actually used for the distributed version, including applicable changes, interfaces and build/install scripts under GPLv2 section 3.",
+    "hash_role": "Identify the recorded artifacts and support provenance; an identical rebuild hash is not the sole acceptance method.",
+    "unknown_is_prohibition": false,
+    "references": [
+      "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html",
+      "https://www.gnu.org/licenses/gpl-faq.en.html#MustSourceBuildToMatchExactHashOfBinary",
+      "https://docs.kernel.org/process/license-rules.html"
+    ]
+  },
+  "firmware_license_evidence": {
+    "status": "UNKNOWN_FOR_EXACT_INCLUDED_BLOB_SET",
+    "scope": "No per-file radio/DDR/boot firmware license map was established by the bounded supplied-library/meta-layer inspection. Do not infer blob terms from GPL driver terms.",
+    "next_action": "Obtain exact normal/recovery firmware file/package/license mapping and apply existing grants/conditions."
+  },
+  "additional_image_obligations": [
+    "Actual U-Boot/SPL source/configuration/build-install scripts and boot-container component mapping",
+    "Recovery kernel/initramfs GPL component sources and applicable notices",
+    "Normal rootfs package/license/source inventory; GPL/LGPL source and any applicable relinking obligations",
+    "Preserve .NET SDK MIT license and supplied third-party notices; assess their component-specific terms"
+  ],
+  "release_inventory": "redistribution-inventory.json",
+  "vendor_request": "../../docs/vendor-source-request.md"
 }

@@ -15,5 +15,10 @@
       "bytes": 6852648,
       "sha256": "09302f90c65e8f21c12e8c2bb6ae84d3a0160fdb63f973bb434af8800b829c15"
     }
+  },
+  "license": {
+    "path": "LICENSES/NXP-UUU-BSD-3-Clause.txt",
+    "sha256": "cc8d47f7b9260f6669ecd41c24554c552f17581d81ee8fc602c6d23edb8bf495",
+    "source": "https://raw.githubusercontent.com/nxp-imx/mfgtools/uuu_1.5.243/LICENSE"
   }
 }

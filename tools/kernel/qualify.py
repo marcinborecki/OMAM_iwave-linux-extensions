@@ -18,6 +18,7 @@ import time
 sys.dont_write_bytecode = True
 from build import REPO, RESERVE, constraints, identity, sha, write_json, interrupted, resource_arguments
 from process_group import stop
+from source_identity import relative_name, strict_document
 from module_abi import (ElfModule, check_versions, check_vermagic, supported_relocations,
                         check_namespaces, gpl_compatible_licenses, check_gpl_imports)
 
@@ -45,10 +46,38 @@ def verify_imu_package(directory: Path, release: str) -> None:
             raise ValueError("IMU module differs from its manifest: " + item["file"])
 
 
+def native_baseline_names(baseline: Path, vendor_inputs: dict, build_inputs: dict):
+    """Use a source-bound compact inventory or the unchanged legacy module-tree route."""
+    stock_receipt, inventory_hash, _ = strict_document(baseline / "baseline/stock-external-modules.json", 8 * 1024**2)
+    if "native_paths" in stock_receipt:
+        rootfs_hash = vendor_inputs.get("files", {}).get("inputs/vendor/Linux/rootfs.tar.zst", {}).get("sha256")
+        paths = stock_receipt["native_paths"]
+        count = stock_receipt.get("native_count")
+        if (build_inputs.get("stock_module_inventory_sha256") != inventory_hash
+                or not isinstance(rootfs_hash, str) or not re.fullmatch("[a-f0-9]{64}", rootfs_hash)
+                or stock_receipt.get("rootfs_sha256") != rootfs_hash):
+            raise ValueError("Compact module inventory differs from its build or stock-rootfs identity")
+        if (type(count) is not int or count <= 0 or not isinstance(paths, list)
+                or len(paths) != count or any(not isinstance(name, str) for name in paths)):
+            raise ValueError("Compact module inventory must declare every native module path")
+        for name in paths:
+            relative_name(name)
+            if not name.endswith(".ko"):
+                raise ValueError("Compact native inventory contains a non-module path")
+        if len(set(paths)) != count:
+            raise ValueError("Compact native inventory contains duplicate module paths")
+        return stock_receipt, set(paths)
+    old_roots = list((baseline / "baseline/kernel-set/lib/modules").glob("*/kernel"))
+    if len(old_roots) != 1:
+        raise ValueError("Need exactly one accepted baseline in-tree module set")
+    return stock_receipt, {p.relative_to(old_roots[0]).as_posix() for p in old_roots[0].rglob("*.ko")}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("source", "baseline", "toolchain", "work", "output", "receipt"):
         parser.add_argument("--" + name, type=Path, required=True)
+    parser.add_argument("--source-manifest", type=Path, help="the same published source-manifest.json used for compilation")
     resource_arguments(parser)
     args = parser.parse_args()
     for name in ("source", "baseline", "toolchain", "work", "output", "receipt"):
@@ -65,7 +94,7 @@ def main() -> int:
         patch_path = args.baseline / "inputs/meta-iwave/recipes-kernel/linux/linux-iwg" / patch_input["file"]
         if sha(patch_path) != patch_input["sha256"]:
             parser.error("Vendor patch differs from its acquisition receipt: " + patch_input["file"])
-    if identity(args.source, args.baseline, args.toolchain, release) != receipt["inputs"]:
+    if identity(args.source, args.baseline, args.toolchain, release, args.source_manifest) != receipt["inputs"]:
         parser.error("Build inputs changed since the candidate compilation")
     if args.output.exists():
         parser.error("Use an absent candidate output directory; preserve or explicitly retire existing output")
@@ -137,11 +166,7 @@ def main() -> int:
         native = sorted(module_root.rglob("*.ko"))
         if not native:
             raise ValueError("No in-tree modules installed")
-        stock_receipt = json.loads((args.baseline / "baseline/stock-external-modules.json").read_text())
-        old_roots = list((args.baseline / "baseline/kernel-set/lib/modules").glob("*/kernel"))
-        if len(old_roots) != 1:
-            raise ValueError("Need exactly one accepted baseline in-tree module set")
-        old_names = {p.relative_to(old_roots[0]).as_posix() for p in old_roots[0].rglob("*.ko")}
+        stock_receipt, old_names = native_baseline_names(args.baseline, vendor_inputs, receipt["inputs"])
         new_names = {p.relative_to(module_root / "kernel").as_posix() for p in native}
         if new_names != old_names or len(native) != stock_receipt["native_count"]:
             raise ValueError("In-tree module names changed from the pinned baseline")

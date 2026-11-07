@@ -101,7 +101,7 @@ def regular_files(root):
 
 def validate_vendor(root, manifest_path, rootfs_pin=None):
     manifest = document(manifest_path, "REL3.3 preparation manifest")
-    if (manifest.get("schema") != "omam.rel33.preparation-inputs.v1" or manifest.get("status") != "ready"
+    if (manifest.get("schema") not in {"iwave.rel33.preparation-inputs.v1", "omam.rel33.preparation-inputs.v1"} or manifest.get("status") != "ready"
             or manifest.get("archive_sha256") != REL33_ARCHIVE_SHA256):
         raise ValueError("REL3.3 requires its completed preparation manifest and original archive identity")
     declared = manifest.get("files")
@@ -144,7 +144,7 @@ def release_sources(energy_manifest, energy_patch, flexcan_manifest, uapi):
 def validate_kernel(root, receipt_path, vendor, sources):
     root = Path(root)
     receipt = document(receipt_path, "Kernel build receipt")
-    if receipt.get("schema") != "omam.rel33.kernel-build.v2" or receipt.get("status") != QUALIFIED:
+    if receipt.get("schema") not in {"iwave.rel33.kernel-build.v2", "omam.rel33.kernel-build.v2"} or receipt.get("status") != QUALIFIED:
         raise ValueError("REL3.3 requires a completed kernel build and static ABI qualification")
     qualification = receipt.get("qualification", {})
     if not isinstance(qualification, dict):

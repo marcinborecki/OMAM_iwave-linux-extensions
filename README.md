@@ -20,6 +20,88 @@ project built around the supplied BSP and specific Linux extensions.
 the downstream project. The device drawing explains roles and connections; actual
 connector placement follows the selected hardware revision.*
 
+## What you receive and what you must obtain
+
+Two separate public deliveries are provided: the preferred Linux **source snapshot**
+and a **GPL kernel-core package** with Image, Device Tree and 809 modules. Neither
+is a complete flash image. The Git checkout supplies maintained patches, tools,
+tests and hardware profiles. A complete local image also needs your independently
+obtained iWave BSP and the pinned Microsoft .NET download. Rebuilding the kernel
+from source additionally needs the pinned compiler.
+
+The supported assembly route rebuilds the Linux core and in-tree drivers, builds
+the two IMU modules, preserves five factory modules from that exact BSP, and layers
+the result plus .NET into the factory root filesystem. It does not rebuild every
+Yocto package, bootloader or recovery component from source.
+
+```mermaid
+flowchart TD
+    G["This Git repository<br/>extensions, tools, profiles, tests"]:::included
+    S["Public source release<br/>modified Linux source and configuration"]:::included
+    D["Public downloads<br/>Microsoft .NET SDK<br/>Ubuntu compiler for source rebuilds"]:::download
+    R["Public GPL kernel-core package<br/>Image, DTB and 809 modules"]:::included
+    V["Obtain from iWave for your unit<br/>exact TCH REL3.3 BSP delivery"]:::vendor
+    V --> B["Stock rootfs, bootloader and recovery files"]:::vendor
+    V --> P["Prepare verified baseline<br/>stock config and five factory modules"]
+    G --> P
+    S --> K["Compile Linux core and 807 in-tree modules<br/>build two IMU modules"]
+    D --> K
+    P --> K
+    K --> Q["Validate complete 814-module candidate<br/>pin an explicit local image policy"]
+    R --> X["Restore only five missing factory modules"]
+    P --> X
+    X --> Q
+    P --> Q
+    G --> Q
+    Q --> C["Compose and verify neutral base"]
+    B --> C
+    D --> C
+    C --> N["Local base image<br/>Linux, drivers, factory services and .NET"]
+    N --> A["Separate downstream project<br/>add application and private device profile"]
+    classDef included fill:#dcfce7,stroke:#15803d,color:#111827
+    classDef download fill:#dbeafe,stroke:#1d4ed8,color:#111827
+    classDef vendor fill:#fef3c7,stroke:#b45309,color:#111827
+```
+
+Green blocks are supplied publicly by this project; blue inputs have pinned public
+downloads; amber inputs come from the board's vendor delivery. This is an assembly
+map, not a connector diagram or a blanket license for every component of the BSP.
+
+| Component | Its role | Where to get it | Present publication boundary |
+|---|---|---|---|
+| Modified Linux source, driver changes and build tools | CPU/memory, hardware support and the CAN/IMU/power changes described below | This repository and its source-release asset | Published with retained source licenses and notices |
+| GPL kernel-core package | Use the already compiled/qualified Image, DTB, 807 native modules and two IMU modules | Release asset selected by `kernel-core-release.json` | Published with GPL/source references; five factory module files are explicitly omitted and restored from your BSP |
+| Factory rootfs | Base userspace, services, vendor libraries and device firmware | iWave TCH REL3.3 BSP for the matched unit | Not included here; individual package/source obligations and separate binary terms must be established for public image delivery |
+| Bootloader and recovery files | Start the board and provide the USB programming environment | The same exact iWave BSP delivery | Not included here; obtain the complete delivery, including applicable sources and notices |
+| Five factory modules: cryptodev, igb_uio, kpage_ncache, mlan, moal | Retained kernel functionality qualified together with the rebuilt kernel | Extracted from the exact stock BSP by `tools/kernel/prepare.py` | Binary modules are not in this release; three public candidate source trees are identified, but their complete factory-source correspondence remains unconfirmed |
+| .NET SDK and runtimes | Run applications above Linux | Pinned Microsoft HTTPS download through `tools/image/sdk_payload.py` | Downloaded separately; its bundled license and third-party notices remain applicable |
+| Compiler and native tools | Compile and qualify the ARM64 kernel | Nine pinned Ubuntu package URLs in `build-toolchain.json` | Downloaded separately; exact sizes/hashes are supplied |
+| Application, SIM/network settings and device identity | Decide what to collect and how a particular device operates | Your separate downstream project | Added after base-image verification, using your own profile |
+
+The delivered GPL core can also be compiled independently from the public Linux
+source/configuration and compiler; it does not require a vendor login or stock
+rootfs. The BSP dependency belongs to restoring the five factory modules and
+assembling the complete system. `docs/source-delivery.md` records the core-only
+make/IMU commands; the complete supported image routes are self-contained below.
+
+The vendor delivery's nine required files and their exact identities are recorded
+in `profiles/tch-g62h-imx91-rel3.3/vendor-files.lock.json`. Request
+`iG-PRGTT-BN-R2.0-REL3.3_Telematics_Connect_Hub` for the G62H i.MX91 unit from the
+iWave contact who supplied the hardware/BSP. The required paths are listed in the
+installation section below. The source archive cannot replace those binary inputs.
+
+GPL-covered Linux code and our changes can be redistributed under their existing
+licenses without an additional iWave permission. Distribution of GPL binaries
+requires a compliant corresponding-source route. Separate libraries and firmware
+have their own terms: **unconfirmed terms are not a confirmed redistribution ban**.
+The exact outstanding items and evidence are recorded in
+`profiles/tch-g62h-imx91-rel3.3/redistribution-inventory.json`; an owner-sendable
+request is provided as `docs/vendor-source-request.md`. No vendor message is sent
+by these tools. A bit-identical rebuild is a technical provenance check, not a GPL
+requirement. [GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html) and the
+[kernel licensing rules](https://docs.kernel.org/process/license-rules.html)
+explain the licenses underlying these distinctions.
+
 ## What iWave and the Connect Hub are
 
 iWave designs embedded computing hardware and its Board Support Packages (BSPs).
@@ -137,8 +219,10 @@ its motivation, activation path and impact below.
 ## What is available to download
 
 The public repository contains the maintained extensions, tests, profiles and image
-recipes. The source-only release also supplies the actual preferred modified
-kernel-core tree with original notices and a per-file manifest.
+recipes. The source release supplies the actual preferred modified Linux tree with
+original notices and a per-file manifest. The separate kernel-core binary delivery
+contains 809 modules, Image and DTB; its source references and GPL notices are
+included. `profiles/tch-g62h-imx91-rel3.3/kernel-core-release.json` pins its download.
 
 Complete firmware images currently remain local. The composed image retains five
 factory modules with public candidate sources whose correspondence to the shipped
@@ -146,6 +230,15 @@ binaries still needs verification. Redistribution terms for included libTelemati
 and other vendor binary payloads remain to be established from the supplied material.
 Those image-specific questions are separate from the GPL source release, whose
 stated license provides its redistribution permissions.
+
+The stock userspace inventory is recorded in
+`profiles/tch-g62h-imx91-rel3.3/stock-packages.json`: 2,720 installed packages from
+575 Yocto recipe names. Its source dpkg metadata provides no `License` or `Source`
+fields, and the inspected image contains no named license manifest. That is a gap
+in the supplied licensing/source records, not evidence that the packages have no
+licenses. Request the matching Yocto licensing and source exports from iWave;
+combine them with this project's kernel/IMU source and the .NET notices for the
+actual image you distribute. The stock list alone is not a final-image SBOM.
 
 ## What is supported
 
@@ -388,92 +481,463 @@ application authority, device key or application-server configuration. A few sta
 kernel ABI/module provenance identifiers contain the original project name; those
 are source/interface identities, not provisioned application state.
 
-## Build prerequisites and input placement
+## Assemble with the published GPL kernel core
 
-Use Linux with Python 3.12 or newer, `zstd` and the standard archive tools. Native
-C checks need a C compiler; full kernel builds need the pinned ARM64 toolchain,
-`make`, binutils, kmod and their normal build prerequisites. Python tests use pytest; the C and standard-library unittest runners also work
-without pytest. Install test dependencies in your own virtual environment with
-`python3 -m venv .local/test-env` and `.local/test-env/bin/python -m pip install pytest`. No .NET build, device
-connection, account credential or elevated privilege is needed to compose the
-public rootfs archive from already acquired inputs.
+This route uses a precompiled, statically qualified core. It needs a Linux host,
+Python 3.12+, GNU tar and zstd; an ARM64 compiler is required only for the separate
+source-rebuild route below. The full neutral image still requires the exact iWave
+BSP and Microsoft SDK. The assembler adds exactly the five omitted factory files,
+checks the complete 814-module set, then qualifies an explicit local image policy.
+It does not obtain vendor material implicitly or add an application/device profile.
 
-The following paths are local examples used by the CLI below. They are ignored
-acquisition/build inputs, not downloadable files provided by this Git checkout:
+### Assemble on the host
 
-```text
-.local/vendor/tch-g62h-imx91-rel3.3/
-.local/vendor-manifest.json
-.local/sources/linux/
-.local/toolchain/
-.local/kernel-set/
-.local/kernel-build.json
-.local/sdk/dotnet-11.0.100-rc.3.26522.148-linux-arm64/
-```
-
-The vendor manifest binds the original delivery identity and all nine required
-boot/rootfs files. A kernel qualification receipt must match the complete module
-set and its exact manifest. The SDK staging report must match the SDK lock and
-actual payload tree. Do not replace pins merely to accept a convenient download.
-The original vendor ZIP is unnecessary after its exact extracted inputs have been
-retained and verified; it is needed again if those inputs must be acquired afresh.
-
-Inspect the kernel source before building:
+From the current public repository root, choose a new assembly workspace and the
+exact vendor delivery. Set these paths once; subsequent blocks use the same values:
 
 ```sh
-python3 -B tools/kernel/apply.py --source .local/sources/linux --with-energy --check
-python3 -B tools/kernel/build.py --help
-python3 -B tools/kernel/qualify.py --help
+project_root="$PWD"
+assembly_root=/absolute/path/to/new/tch-core-assembly
+vendor_root=/absolute/path/to/the/supplied/REL3.3/delivery
+baseline_root="$assembly_root/bsp-baseline"
+core_extract="$assembly_root/core-extracted"
+bundle_root="$core_extract/iwave-kernel-core"
+release_record="$project_root/profiles/tch-g62h-imx91-rel3.3/kernel-core-release.json"
+sdk_root="$assembly_root/dotnet-11.0.100-rc.3.26522.148-linux-arm64"
+local_policy="$assembly_root/local-image-policy.json"
+image_root="$assembly_root/neutral-base"
+export assembly_root release_record
+mkdir -p "$assembly_root/downloads"
 ```
 
-The build and qualify commands require explicit source, baseline, toolchain, work,
-output and receipt paths. They verify CPU affinity, cgroup CPU/memory limits and
-an owned process lifetime. `--allowed-cpus` names the CPUs actually reserved for
-that run; defaults for other bounds are shown by `--help`. Choose those CPUs on
-your host, not a machine-specific example copied from another installation. Full
-kernel builds are separate from applying/checking a patch or composing an image.
-
-## Compose and verify the base
-
-First inspect the pinned inputs and storage admission without writing an image:
+Read the asset's name, URL, size and SHA-256 from the **trusted release record**.
+This bounded downloader verifies an existing cache or a new download before returning;
+it never guesses a release filename/hash and never overwrites a different cache:
 
 ```sh
+python3 -B - <<'FETCH_CORE'
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import time
+from urllib.parse import urlsplit
+from urllib.request import urlopen
+
+record_path = Path(os.environ['release_record'])
+if not record_path.is_file():
+    raise SystemExit('Kernel-core release descriptor is not available in this checkout yet')
+record = json.loads(record_path.read_text())
+if record.get('schema') != 'iwave.kernel-core-release.v1':
+    raise SystemExit('Unexpected kernel-core release descriptor schema')
+asset = record['archive']
+name, size, expected, url = (asset[key] for key in ('name', 'bytes', 'sha256', 'url'))
+if (Path(name).name != name or not name or type(size) is not int or size <= 0
+        or not re.fullmatch(r'[0-9a-f]{64}', expected)
+        or urlsplit(url).scheme != 'https' or urlsplit(url).hostname != 'github.com'):
+    raise SystemExit('Unsafe or incomplete asset descriptor')
+folder = Path(os.environ['assembly_root']) / 'downloads'
+folder.mkdir(parents=True, exist_ok=True)
+target = folder / name
+created = False
+try:
+    if not target.exists():
+        if shutil.disk_usage(folder).free < size + 500 * 1024**2:
+            raise SystemExit('Need the asset size plus 500 MiB free reserve')
+        deadline = time.monotonic() + 900
+        total = 0
+        with target.open('xb') as output:
+            created = True
+            with urlopen(url, timeout=60) as incoming:
+                while block := incoming.read(1024 * 1024):
+                    total += len(block)
+                    if total > size or time.monotonic() > deadline:
+                        raise RuntimeError('Download exceeded its declared size or deadline')
+                    output.write(block)
+    if target.is_symlink() or not target.is_file() or target.stat().st_size != size:
+        raise RuntimeError('Kernel-core archive size/type mismatch')
+    with target.open('rb') as content:
+        actual = hashlib.file_digest(content, 'sha256').hexdigest()
+    if actual != expected:
+        raise RuntimeError('Kernel-core archive SHA-256 mismatch')
+except BaseException:
+    if created:
+        target.unlink(missing_ok=True)
+    raise
+print('Verified archive:', target)
+FETCH_CORE
+```
+
+Extract only that verified archive into a new directory. The descriptor is read
+again to obtain its exact filename; the shell variable is quoted:
+
+```sh
+core_name="$(python3 -B - "$release_record" <<'ASSET_NAME'
+import json
+from pathlib import Path
+import sys
+name = json.loads(Path(sys.argv[1]).read_text())['archive']['name']
+if not name or Path(name).name != name:
+    raise SystemExit('Unsafe archive filename')
+print(name)
+ASSET_NAME
+)"
+mkdir "$core_extract"
+tar --zstd --no-same-owner --same-permissions \
+  -xf "$assembly_root/downloads/$core_name" -C "$core_extract"
+```
+
+Prepare the board-specific baseline **without a compiler**, then restore only the
+five exact omitted factory modules from that supplied BSP:
+
+```sh
+python3 -B tools/kernel/prepare.py --vendor-root "$vendor_root" --output "$baseline_root"
+python3 -B tools/kernel/core_bundle.py restore --bundle-root "$bundle_root" \
+  --baseline "$baseline_root" --vendor-root "$vendor_root" --release-record "$release_record"
+```
+
+The restored kernel directory is `$bundle_root/kernel` and its receipt is
+`$bundle_root/kernel-build.json`. Restore verifies the trusted delivery record,
+public files and factory-module identities, then runs the actual full 814-module
+kernel-set validator. A renamed or approximate module is not a substitute.
+
+Stage the pinned Microsoft SDK, generate a distinct local candidate policy and
+validate composition inputs. These operations do not execute the ARM64 SDK on the
+host and do not compile the kernel:
+
+```sh
+python3 -B tools/image/sdk_payload.py stage \
+  --manifest profiles/tch-g62h-imx91-rel3.3/dotnet-sdk.lock.json \
+  --cache-dir "$assembly_root/downloads/dotnet" --output-dir "$sdk_root"
+python3 -B tools/image/qualify_profile.py --vendor-root "$vendor_root" \
+  --vendor-manifest "$baseline_root/inputs/manifest.json" \
+  --kernel-root "$bundle_root/kernel" --kernel-receipt "$bundle_root/kernel-build.json" \
+  --sdk "$sdk_root" --output "$local_policy"
+python3 -B tools/image/build_base.py --profile tch-g62h-imx91-rel3.3 \
+  --vendor-root "$vendor_root" --vendor-manifest "$baseline_root/inputs/manifest.json" \
+  --kernel-root "$bundle_root/kernel" --kernel-receipt "$bundle_root/kernel-build.json" \
+  --sdk "$sdk_root" --image-policy "$local_policy" --output "$image_root" --dry-run
+```
+
+After accepting that dry-run selection and its output/scratch allowance, compose
+and independently validate the new neutral base using that same explicit policy:
+
+```sh
+python3 -B tools/image/build_base.py --profile tch-g62h-imx91-rel3.3 \
+  --vendor-root "$vendor_root" --vendor-manifest "$baseline_root/inputs/manifest.json" \
+  --kernel-root "$bundle_root/kernel" --kernel-receipt "$bundle_root/kernel-build.json" \
+  --sdk "$sdk_root" --image-policy "$local_policy" --output "$image_root"
+python3 -B - "$image_root" "$local_policy" <<'CHECK_IMAGE'
+from pathlib import Path
+import sys
+sys.path.insert(0, str(Path('tools/image').resolve()))
+from build_base import validate_base
+validate_base(Path(sys.argv[1]), policy_path=Path(sys.argv[2]))
+print('Validated neutral image against the selected local policy')
+CHECK_IMAGE
+```
+
+Keep the maintained default image policy unchanged. A successful local policy/base
+check establishes the recorded software/archive boundary, not physical boot or CAN,
+IMU, power/current/wake acceptance. Each new output path must be absent. An existing
+SDK/base is reused by its verified identity rather than overwritten to follow an
+example. Preserve at least 500 MiB free beyond outputs on each involved filesystem.
+
+
+## Build a neutral image from source and the supplied BSP
+
+Use the tools from this current checkout together with the published source
+snapshot. The archive's `extensions/` directory records its original release;
+it does not replace these maintained tools. The route below prepares its own
+receipts from an independently obtained BSP and explicitly qualifies the new build.
+It does not require the original developer's Git metadata or acquisition receipts.
+
+### Host and storage preparation
+
+The exercised host is native ARM64 Ubuntu 26.04 LTS. Use a native ARM64 Linux
+host with a compatible Ubuntu userspace, Python 3.12+,
+Git, zstd, GNU tar/timeout, dpkg-deb, make, binutils, a host C compiler, kmod/depmod,
+patch and the normal Linux build headers/libraries. The pinned target compiler is
+`aarch64-linux-gnu-gcc-14 (Ubuntu 14.3.0-14ubuntu1) 14.3.0`. A compatible host must
+supply development support such as libc, OpenSSL, ELF, zlib and zstd headers.
+Installing the pinned prefix is not a replacement for the host's dependency set.
+The maintained build scripts require native ARM64 and an explicit cgroup v2 scope,
+CPU affinity, no swap, bounded memory and lowered priority.
+
+Plan disk placement before downloading or compiling. The following are input
+measurements and tool admissions, not elapsed-time estimates or a guarantee for
+another filesystem:
+
+| Material or stage | Size or admission |
+|---|---|
+| Published source archive | 230,766,173 bytes compressed; its complete regular-file payload is 1,531,588,302 bytes. Small-file allocation and directories require additional space. |
+| Nine toolchain packages | 35,609,694 bytes downloaded; the retained extracted prefix has 115,518,770 logical regular-file bytes. |
+| Stock rootfs | 1,322,170,532 bytes compressed, in addition to boot/recovery inputs supplied by the BSP. |
+| SDK payload | The retained staged SDK has 576,381,329 logical payload bytes; staging also needs its compressed download and temporary extraction. |
+| Baseline preparation | Tool admission: 32 MiB plus the 500 MiB reserve. It extracts configuration and five modules, not a second rootfs. |
+| Native full build | Tool admission: 3 GiB work/output allowance plus the 500 MiB reserve. |
+| Static qualification | Requires another 600 MiB free plus the reserve while build outputs remain available. |
+| Neutral composition | Run `build_base.py --dry-run` for the current exact bound. The previously accepted inputs admitted 3,389,183,935 output bytes plus 97,426,019 scratch bytes and the reserve; a rebuilt candidate is checked again from its actual sizes. |
+
+These requirements can overlap. A filesystem with only 3.5 GiB initially free
+cannot also hold every downloaded input, unpacked tree, work directory and composed
+image. Separate large input, work and output filesystems if necessary. Every stage
+must preserve at least 500 MiB beyond its admitted outputs. Keep one accepted
+candidate, the required inputs and rollback material; remove only owned temporary
+or superseded outputs after their replacement has been accepted.
+
+### Acquire the source and toolchain
+
+Clone the current repository if needed, then run subsequent commands from its root:
+
+```sh
+git clone https://github.com/marcinborecki/OMAM_iwave-linux-extensions.git
+cd OMAM_iwave-linux-extensions
+mkdir -p .local/downloads
+```
+
+The following standard-library block fetches only the source asset and the nine
+pinned packages. It verifies both size and SHA256 before publishing each local
+file, and reuses an existing cache entry only after verification. It requires
+room for downloads, a 2 GiB source-extraction allowance, a 256 MiB toolchain
+allowance and the 500 MiB reserve on this input filesystem. Recheck actual free
+space before later stages.
+
+```sh
+python3 -B - <<'PY'
+import hashlib, json, os, shutil, signal, tempfile, urllib.request
+from pathlib import Path
+profile = Path('profiles/tch-g62h-imx91-rel3.3')
+release = json.loads((profile / 'source-release.json').read_text())
+toolchain = json.loads((profile / 'build-toolchain.json').read_text())
+items = [dict(release['archive'])]
+items += [{**item, 'name': item['deb']} for item in toolchain['packages']]
+cache = Path('.local/downloads')
+def interrupted(*_):
+    raise KeyboardInterrupt
+signal.signal(signal.SIGTERM, interrupted)
+required = sum(item['bytes'] for item in items) + 2 * 1024**3 + 256 * 1024**2 + 500 * 1024**2
+if shutil.disk_usage(cache).free < required:
+    raise SystemExit('Insufficient free space for downloads, extraction allowances and reserve')
+for item in items:
+    target = cache / item['name']
+    if target.exists():
+        with target.open('rb') as stream:
+            actual = hashlib.file_digest(stream, 'sha256').hexdigest()
+        if target.stat().st_size != item['bytes'] or actual != item['sha256']:
+            raise SystemExit('Existing cache entry differs: ' + target.name)
+        continue
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=cache, prefix='.download-', delete=False) as stream:
+            temporary = Path(stream.name)
+            digest, total = hashlib.sha256(), 0
+            with urllib.request.urlopen(item['url'], timeout=60) as response:
+                while chunk := response.read(1024 * 1024):
+                    total += len(chunk)
+                    if total > item['bytes']:
+                        raise ValueError('Download exceeds pinned size')
+                    digest.update(chunk)
+                    stream.write(chunk)
+        if total != item['bytes'] or digest.hexdigest() != item['sha256']:
+            raise ValueError('Download differs from its size/SHA256 pin')
+        os.link(temporary, target)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+PY
+```
+
+Extract into new destinations. This block uses temporary directories on the same
+filesystem and publishes each directory only after successful extraction. The
+owned child process group and temporary directory are cleaned on interruption or
+failure. It does not install the packages globally.
+
+```sh
+python3 -B - <<'PY'
+import json, os, signal, subprocess, tempfile
+from pathlib import Path
+profile = Path('profiles/tch-g62h-imx91-rel3.3')
+release = json.loads((profile / 'source-release.json').read_text())
+packages = json.loads((profile / 'build-toolchain.json').read_text())['packages']
+cache = Path('.local/downloads').resolve()
+def interrupted(*_):
+    raise KeyboardInterrupt
+signal.signal(signal.SIGTERM, interrupted)
+def run(command, deadline):
+    child = subprocess.Popen(command, start_new_session=True)
+    try:
+        if child.wait(timeout=deadline):
+            raise ValueError('Extraction command failed')
+    finally:
+        if child.poll() is None:
+            os.killpg(child.pid, signal.SIGTERM)
+            try:
+                child.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                os.killpg(child.pid, signal.SIGKILL)
+                child.wait(timeout=5)
+for destination, kind in ((Path('.local/source-release'), 'source'), (Path('.local/toolchain'), 'toolchain')):
+    if destination.exists() or destination.is_symlink():
+        raise SystemExit('Use an absent extraction destination: ' + str(destination))
+    with tempfile.TemporaryDirectory(prefix='.extract-', dir=destination.parent) as temporary:
+        stage = Path(temporary) / 'payload'
+        stage.mkdir()
+        if kind == 'source':
+            run(['tar', '--zstd', '--no-same-owner', '--same-permissions', '-xf',
+                 str(cache / release['archive']['name']), '-C', str(stage)], 300)
+        else:
+            for item in packages:
+                run(['dpkg-deb', '-x', str(cache / item['deb']), str(stage)], 60)
+        stage.rename(destination)
+PY
+```
+
+Set paths explicitly. `vendor_root` must point at the separately supplied directory
+that directly contains `Firmware/`, `Linux/` and
+`iG-PRGTT-TelematicsConnectHub.uuu`.
+
+```sh
+project_root="$PWD"
+source_root="$project_root/.local/source-release/iwave-linux-source/linux"
+source_manifest="$project_root/.local/source-release/iwave-linux-source/source-manifest.json"
+toolchain_root="$project_root/.local/toolchain"
+baseline_root="$project_root/.local/rebuild-inputs"
+vendor_root=/absolute/path/to/the/supplied/REL3.3/delivery
+work_root=/absolute/path/to/new/kernel-work
+kernel_root="$project_root/.local/rebuilt-kernel"
+kernel_receipt="$project_root/.local/rebuilt-kernel-build.json"
+release_name=6.12.34-iwave-rel33-rebuild1
+```
+
+The published source manifest is 18,432,045 bytes with SHA256
+`11d819b4da74eff7ed8cd81517c739d20f08cf69c42b1364fab4e5608a920d9e`.
+The current profile binds it. `--source-manifest` validates every Linux source
+file's bytes, type, mode and link target, and rejects extra relevant files. It
+works without Git metadata; a root `.git` directory is not read. The existing
+legacy Git-based route remains available when that option is omitted.
+
+### Prepare the board baseline
+
+```sh
+python3 -B tools/kernel/prepare.py \
+  --vendor-root "$vendor_root" --toolchain "$toolchain_root" \
+  --output "$baseline_root"
+python3 -B tools/kernel/apply.py --source "$source_root" --with-energy --check
+```
+
+Preparation validates all nine vendor files and the pinned compiler, extracts the
+stock Image's embedded configuration, records all 807 native module names, extracts
+only the five exact external modules and records the fifteen public vendor patches.
+It generates the acquisition/toolchain/baseline receipts required by the build.
+The source archive is already patched, so use `--check` rather than reapplying
+vendor or project changes. An output directory from an unrelated preparation is
+not accepted as a replacement.
+
+### Compile and qualify the complete kernel set
+
+Choose CPUs actually reserved on your host. The `1,2` example must be changed if
+those CPUs are unavailable or belong to another workload. Keep the exact same
+source manifest, prepared inputs, compiler, work directory and release throughout
+compilation and qualification. `work_root` must be outside `source_root`.
+
+```sh
+build_cpus=1,2
+systemd-run --user --scope --collect --unit=iwave-kernel-full \
+  -p CPUQuota=150% -p AllowedCPUs="$build_cpus" \
+  -p MemoryMax=6G -p MemorySwapMax=0 -p RuntimeMaxSec=11200 \
+  taskset -c "$build_cpus" nice -n 10 python3 -B tools/kernel/build.py \
+  --allowed-cpus "$build_cpus" --cpu-percent 150 --memory-gib 6 --jobs 2 --nice-min 10 \
+  --source "$source_root" --source-manifest "$source_manifest" \
+  --baseline "$baseline_root" --toolchain "$toolchain_root" --work "$work_root" \
+  --output "$kernel_root" --receipt "$kernel_receipt" \
+  --release "$release_name" --phase full
+
+systemd-run --user --scope --collect --unit=iwave-kernel-qualify \
+  -p CPUQuota=150% -p AllowedCPUs="$build_cpus" \
+  -p MemoryMax=6G -p MemorySwapMax=0 -p RuntimeMaxSec=2400 \
+  taskset -c "$build_cpus" nice -n 10 python3 -B tools/kernel/qualify.py \
+  --allowed-cpus "$build_cpus" --cpu-percent 150 --memory-gib 6 --jobs 2 --nice-min 10 \
+  --source "$source_root" --source-manifest "$source_manifest" \
+  --baseline "$baseline_root" --toolchain "$toolchain_root" --work "$work_root" \
+  --output "$kernel_root" --receipt "$kernel_receipt"
+```
+
+Do not create `kernel_root` before qualification. Build outputs live in the owned
+work directory; the qualifier requires a new output directory. It installs the
+native modules, preserves the five stock external binaries, builds the patched
+upstream IMU pair, generates dependency indexes and checks symbols, namespaces,
+loader/ABI layout, relocations, Image/config identity and DTB expectations. A
+successful full compilation and a successful static qualification are distinct
+results. Qualification failure is a failed candidate, not permission to drop a
+module or weaken its checks.
+
+### Stage the SDK, pin the candidate and compose
+
+Create the SDK parent, then stage the public lock through the current tool:
+
+```sh
+mkdir -p .local/sdk
+python3 -B tools/image/sdk_payload.py stage \
+  --manifest profiles/tch-g62h-imx91-rel3.3/dotnet-sdk.lock.json \
+  --cache-dir .local/downloads/dotnet \
+  --output-dir .local/sdk/dotnet-11.0.100-rc.3.26522.148-linux-arm64
+sdk_root="$project_root/.local/sdk/dotnet-11.0.100-rc.3.26522.148-linux-arm64"
+local_policy="$project_root/.local/rebuilt-image-policy.json"
+
+python3 -B tools/image/qualify_profile.py \
+  --vendor-root "$vendor_root" --vendor-manifest "$baseline_root/inputs/manifest.json" \
+  --kernel-root "$kernel_root" --kernel-receipt "$kernel_receipt" \
+  --sdk "$sdk_root" --output "$local_policy"
+```
+
+A rebuilt kernel is a new candidate even when its source is unchanged. The
+candidate policy records its actual qualified kernel/manifest hashes and exact
+SDK. It leaves `profiles/tch-g62h-imx91-rel3.3/image-policy.json` unchanged. Only
+pass a local policy produced and reviewed for your own build; do not automatically
+trust a policy supplied beside an unverified image.
+
+Use the explicit local policy for composition. Select suitable scratch/output
+filesystems with the admitted free reserve. The example keeps output under the
+project's ignored artifact directory; it can instead be a new absolute path on
+another filesystem.
+
+```sh
+mkdir -p artifacts
+image_root="$project_root/artifacts/my-rebuilt-neutral-base"
 python3 -B tools/image/build_base.py \
-  --profile tch-g62h-imx91-rel3.3 \
-  --vendor-root .local/vendor/tch-g62h-imx91-rel3.3 \
-  --vendor-manifest .local/vendor-manifest.json \
-  --kernel-root .local/kernel-set \
-  --kernel-receipt .local/kernel-build.json \
-  --sdk .local/sdk/dotnet-11.0.100-rc.3.26522.148-linux-arm64 \
-  --output artifacts/my-neutral-base --scratch-root /var/tmp --dry-run
+  --profile tch-g62h-imx91-rel3.3 --image-policy "$local_policy" \
+  --vendor-root "$vendor_root" --vendor-manifest "$baseline_root/inputs/manifest.json" \
+  --kernel-root "$kernel_root" --kernel-receipt "$kernel_receipt" \
+  --sdk "$sdk_root" --scratch-root /var/tmp --output "$image_root" --dry-run
 ```
 
-Create `artifacts/` first and use a new output directory. Remove `--dry-run` only
-when the inputs and storage check pass. The builder streams the archive; it does
-not extract the whole vendor filesystem into a second working tree. The selected
-output and scratch filesystems must have the predicted headroom plus a 500 MiB
-reserve. A missing input or insufficient space is a refusal, not a partial pass.
+If the dry run succeeds, rerun the identical command without `--dry-run` to compose.
+The output includes nine boot/rootfs files and `base-manifest.json`. The rootfs is
+neutral: accounts locked, no application or owner provisioning, explicit headless
+boot/service dependencies and retained factory battery protection. Composition
+performs its vendor-entry, SDK/kernel and neutral-content checks.
 
-The output contains nine exact boot/rootfs files and `base-manifest.json`. The
-manifest records source/kernel/SDK identities, file hashes, neutralisation and
-qualification boundaries. It records physical loading and hardware readback as
-not run. Run an independent archive-content check on the rootfs:
+Finally validate the actual directory against your explicitly selected policy:
 
 ```sh
-python3 -B tools/image/verify_neutral.py \
-  --rootfs artifacts/my-neutral-base/Linux/rootfs.tar.zst \
-  --sha256 ROOTFS_SHA256_FROM_BASE_MANIFEST \
-  --profile tch-g62h-imx91-rel3.3
+python3 -B - "$image_root" "$local_policy" <<'PY'
+from pathlib import Path
+import sys
+sys.path.insert(0, str(Path('tools/image').resolve()))
+from build_base import validate_base
+validate_base(Path(sys.argv[1]), policy_path=Path(sys.argv[2]))
+print('PASS: actual base content matches the explicitly selected candidate policy')
+PY
 ```
 
-Use the full hash from the manifest in place of the placeholder. A downstream
-consumer must also validate every bound boot file, the current profile, actual
-SDK bytes and the module/index set. A JSON field saying PASS is not proof of the
-archive contents. `validate_base()` performs those checks before private layering.
+Default validation without `policy_path` continues to select the maintained profile.
+A custom-policy candidate is not silently relabelled as that maintained binary
+release. A private application profile must explicitly trust the same local policy
+when layering its own version, access, identity and application configuration.
 
-No command above flashes a device. Flash tooling, jumpers, revision-specific
-wiring, power-loss behavior and boot/readback tests are distinct installation
-work. Do not run an unrelated board's boot image because it has the same CPU.
 
 ## Install on the TCH development unit
 
@@ -522,6 +986,11 @@ NXP UUU 1.5.243 release URLs, sizes and SHA-256 hashes in
 A downstream bundle builder can acquire and verify those utilities directly from
 NXP; it does not need to recover a utility from an older device image. These are
 host-side flashing tools, separate from the firmware installed on the unit.
+The pinned upstream NXP project license is retained in
+`LICENSES/NXP-UUU-BSD-3-Clause.txt`. A downstream bundle produced by the private
+consumer preserves it as `NXP-UUU-LICENSE.txt` beside both executable variants;
+recipient preparation carries that notice forward. Dependencies in a selected
+upstream binary retain their own applicable notices and terms.
 
 A VM must receive the device's USB connection through the boot/recovery re-enumerations. The actual flash bundle
 contains these relative paths:
@@ -541,8 +1010,9 @@ private-flash-bundle/
 
 The source-release archive supplies build inputs; the flash bundle supplies those
 nine installed/recovery inputs. Validate the neutral base with `validate_base()`
-before applying the private profile, then verify the resulting private bundle
-against its own manifest/checksums. Preserve the accepted boot/kernel/SDK identities.
+before applying the private profile, selecting `policy_path` explicitly for a
+locally rebuilt candidate, then verify the resulting private bundle against its
+own manifest/checksums. Preserve the accepted boot/kernel/SDK identities.
 
 ### Programming sequence
 
@@ -647,6 +1117,21 @@ Per-device secrets are inputs to that private stage, not arguments to public CI
 or fields of a public example. Do not derive a neutral base from an already
 provisioned device image. Start from the pinned stock inputs and the explicit
 neutral policy so that removal of known configuration is complete and testable.
+
+## Accepted build and assembly result
+
+The v0.2.0 kernel core was rebuilt from the published source snapshot on ARM64
+Ubuntu 26.04. Static qualification accepted all 814 modules. The public package
+contains 809 module binaries; an actual compiler-free assembly restored the five
+factory files from the exact BSP, composed the neutral image with .NET 11 RC3 and
+passed actual content validation through a downstream consumer. The proof image
+was removed after verification; the maintained default base was preserved.
+
+`profiles/tch-g62h-imx91-rel3.3/build-verification.json` records exact hashes and
+scope. The final Python gates executed 183 public and 464 private-consumer cases,
+with no failures or skips. These host/archive results do not establish physical
+boot, CAN traffic, motion samples or measured power/wake behavior. Full firmware
+remains a separate component/source/redistribution assessment.
 
 ## Verification and maintenance
 

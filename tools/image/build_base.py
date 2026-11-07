@@ -56,16 +56,30 @@ def sizing(vendor_root, sdk, kernel_root, output_parent, scratch_root):
         'reserve_bytes': RESERVE_BYTES, 'same_filesystem': same_device}
 
 
-def validate_base(root, expected_profile=PROFILE_ID):
+def image_policy(profile, policy_path=None):
+    """Select the default release pin or an explicitly trusted local candidate pin."""
+    path = Path(policy_path) if policy_path is not None else profile / 'image-policy.json'
+    policy = document(path, 'Image policy')
+    if (policy.get('schema') != 'iwave.image-profile.v1' or policy.get('profile') != PROFILE_ID
+            or policy.get('qualification') != 'PASS_BUILD_AND_STATIC_ABI'):
+        raise ValueError('Image policy must identify the qualified hardware profile')
+    return policy, path
+
+
+def validate_base(root, expected_profile=PROFILE_ID, policy_path=None):
     """Private consumers must bind the complete base, never silently fall back to stock."""
     profile = load_profile(expected_profile)
-    policy = document(profile / "image-policy.json", "Image policy")
+    policy, policy_file = image_policy(profile, policy_path)
     root = Path(root)
     manifest = document(root / 'base-manifest.json', 'Neutral base manifest')
     if (manifest.get('schema') != 'iwave.linux-base.v1' or manifest.get('profile') != expected_profile
             or manifest.get('privacy', {}).get('status') != 'PASS_SCOPED_ARCHIVE_CONTENT'
             or manifest.get('verification', {}).get('status') != 'PASS'):
         raise ValueError('Neutral base profile or accepted content verification differs')
+    bound_policy = manifest.get('image_policy_sha256')
+    if ((bound_policy is not None or policy_path is not None)
+            and bound_policy != digest(policy_file)):
+        raise ValueError('Neutral base differs from the explicitly selected image policy')
     files = manifest.get('files')
     if not isinstance(files, dict) or set(files) != set(VENDOR_FILES):
         raise ValueError('Neutral base must bind every boot and rootfs file')
@@ -100,7 +114,7 @@ def build(args):
     sources = source_identities()
     kernel = validate_kernel(args.kernel_root, args.kernel_receipt, vendor, sources)
     sdk = validate_sdk(args.sdk, profile / 'dotnet-sdk.lock.json', profile / 'global.json', {})
-    policy = document(profile / "image-policy.json", "Image policy")
+    policy, policy_file = image_policy(profile, getattr(args, 'image_policy', None))
     if kernel["manifest_sha256"] != policy["kernel_manifest_sha256"] or sdk["tree_sha256"] != policy["sdk_tree_sha256"]:
         raise ValueError("Kernel or SDK does not match the qualified image profile")
     if args.dry_run:
@@ -122,6 +136,7 @@ def build(args):
             privacy = verify_neutral(target)
             files = {name: {'bytes': (output / name).stat().st_size, 'sha256': digest(output / name)} for name in VENDOR_FILES}
             manifest = {'schema': 'iwave.linux-base.v1', 'profile': args.profile,
+                'image_policy_sha256': digest(policy_file),
                 'files': files, 'source_date_epoch': args.source_date_epoch,
                 'vendor': vendor, 'source_identities': sources,
                 'kernel': {'release': kernel['manifest']['release'], 'manifest_sha256': kernel['manifest_sha256'],
@@ -131,9 +146,10 @@ def build(args):
                 'sdk': sdk, 'composition': composition, 'verification': verification,
                 'privacy': privacy, 'neutralisation': neutralisation,
                 'redistribution_status': 'BLOCKED',
-                'redistribution_gaps': ['Vendor proprietary library/firmware redistribution permissions unconfirmed',
-                    'Five preserved external GPL-marked modules require complete matching source assessment',
-                    'Complete corresponding-source release package not yet accepted']}
+                'redistribution_gaps': ['Separate vendor library/firmware terms are not established from supplied material',
+                    'Five preserved factory modules have candidate sources; actual vendor source correspondence remains unconfirmed',
+                    'Full-image rootfs, boot and recovery source/notice coverage remains incomplete'],
+                'redistribution_interpretation': 'Local release assessment is incomplete; unknown terms are not a confirmed prohibition'}
             write_json(output / 'base-manifest.json', manifest)
         return {'status': 'PASS_LOCAL_COMPOSITION', 'profile': args.profile,
             'manifest_sha256': digest(output / 'base-manifest.json'), 'files': files,
@@ -149,6 +165,8 @@ def main():
     for name in ('vendor-root', 'vendor-manifest', 'kernel-root', 'kernel-receipt', 'sdk', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--scratch-root', type=Path)
+    parser.add_argument('--image-policy', type=Path,
+        help='Explicit local policy created after qualifying a new kernel; default release pins remain unchanged')
     parser.add_argument('--source-date-epoch', type=int, default=0)
     parser.add_argument('--dry-run', action='store_true', help='Validate pinned inputs and storage; never compose an image')
     args = parser.parse_args()

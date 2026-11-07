@@ -27,5 +27,7 @@
     "moal.ko"
   ],
   "firmware_binaries": "NOT_PUBLISHED; source correspondence and vendor redistribution terms unresolved",
-  "physical_acceptance": "NOT_RUN"
+  "physical_acceptance": "NOT_RUN",
+  "source_manifest_sha256": "11d819b4da74eff7ed8cd81517c739d20f08cf69c42b1364fab4e5608a920d9e",
+  "source_manifest_bytes": 18432045
 }

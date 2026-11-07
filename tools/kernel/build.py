@@ -17,6 +17,7 @@ import time
 sys.dont_write_bytecode = True
 from apply import apply, energy
 from process_group import stop
+from source_identity import check_source_manifest
 
 REPO = Path(__file__).resolve().parents[2]
 RESERVE = 500 * 1024**2
@@ -72,22 +73,31 @@ def constraints(args) -> tuple[Path, dict]:
     return group, result
 
 
-def identity(source: Path, baseline: Path, toolchain: Path, release: str) -> dict:
-    head = subprocess.run(["git", "-C", str(source), "rev-parse", "HEAD"],
-                          capture_output=True, check=True, timeout=30).stdout.decode().strip()
-    if head != SRCR:
-        raise ValueError("Wrong kernel SRCREV")
+def identity(source: Path, baseline: Path, toolchain: Path, release: str, source_manifest: Path | None = None) -> dict:
+    if source_manifest is not None:
+        source_identity = check_source_manifest(source, source_manifest,
+            REPO / "profiles/tch-g62h-imx91-rel3.3/source-release.json")
+        source_identity["source_manifest_verifier_sha256"] = sha(Path(__file__).with_name("source_identity.py"))
+    else:
+        head = subprocess.run(["git", "-C", str(source), "rev-parse", "HEAD"],
+                              capture_output=True, check=True, timeout=30).stdout.decode().strip()
+        if head != SRCR:
+            raise ValueError("Wrong kernel SRCREV")
+        diff = subprocess.run(["git", "-C", str(source), "diff", "--binary", "HEAD"],
+                              capture_output=True, check=True, timeout=30).stdout
+        additions = subprocess.run(["git", "-C", str(source), "ls-files", "--others", "--exclude-standard", "-z"],
+                                   capture_output=True, check=True, timeout=30).stdout.split(b"\0")
+        added_hashes = {name.decode(): sha(source / name.decode()) for name in additions if name}
+        source_identity = {"source_added_files_sha256": added_hashes,
+            "srcrev": head, "source_diff_sha256": hashlib.sha256(diff).hexdigest()}
+    inventory_path = baseline / "baseline/stock-external-modules.json"
+    if source_manifest is not None or (inventory_path.is_file() and "native_paths" in json.loads(inventory_path.read_text())):
+        source_identity["stock_module_inventory_sha256"] = sha(inventory_path)
     apply(source, check_only=True)
-    diff = subprocess.run(["git", "-C", str(source), "diff", "--binary", "HEAD"],
-                          capture_output=True, check=True, timeout=30).stdout
-    additions = subprocess.run(["git", "-C", str(source), "ls-files", "--others", "--exclude-standard", "-z"],
-                               capture_output=True, check=True, timeout=30).stdout.split(b"\0")
-    added_hashes = {name.decode(): sha(source / name.decode()) for name in additions if name}
     energy_identity = energy(source, check_only=True)
     return {
         **energy_identity,
-        "source_added_files_sha256": added_hashes,
-        "srcrev": head, "source_diff_sha256": hashlib.sha256(diff).hexdigest(),
+        **source_identity,
         "flexcan_manifest_sha256": sha(REPO / "components/flexcan-controller-policy/manifest.json"),
         "uapi_sha256": sha(REPO / "components/flexcan-controller-policy/include/uapi/linux/omam_flexcan.h"),
         "stock_config_sha256": sha(baseline / "inputs/stock.config"),
@@ -105,6 +115,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("source", "baseline", "toolchain", "work", "output", "receipt"):
         parser.add_argument("--" + name, type=Path, required=True)
+    parser.add_argument("--source-manifest", type=Path, help="published source-manifest.json for a verified source snapshot without Git")
     parser.add_argument("--release", required=True)
     parser.add_argument("--phase", choices=("driver", "full"), required=True)
     resource_arguments(parser)
@@ -119,7 +130,7 @@ def main() -> int:
     if shutil.disk_usage(args.work).free < 3 * 1024**3 + RESERVE:
         parser.error("Need the measured native work/output allowance (3 GiB) plus 500 MiB reserve")
     group, resources = constraints(args)
-    candidate = identity(args.source, args.baseline, args.toolchain, args.release)
+    candidate = identity(args.source, args.baseline, args.toolchain, args.release, args.source_manifest)
     receipt = json.loads(args.receipt.read_text()) if args.receipt.exists() else {
         "schema": "iwave.rel33.kernel-build.v2", "phases": {}, "physical_loading": "NOT_RUN",
         "hardware_readback": "NOT_RUN", "product_tests_executed": 0,
@@ -196,7 +207,7 @@ def main() -> int:
             run("energy_driver_compile", [*make, "drivers/power/supply/bq256xx_charger.o"], 300)
         else:
             run("image_dtb_modules", [*make, "Image", "freescale/imx91-iwg62h-prgtt.dtb", "modules"], 10800)
-        if identity(args.source, args.baseline, args.toolchain, args.release) != candidate:
+        if identity(args.source, args.baseline, args.toolchain, args.release, args.source_manifest) != candidate:
             raise ValueError("Kernel input identity changed during compilation")
         receipt["status"] = "DRIVER_COMPILED" if args.phase == "driver" else "KERNEL_COMPILED"
         receipt.pop("error", None)

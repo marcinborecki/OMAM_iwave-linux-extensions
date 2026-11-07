@@ -1,0 +1,132 @@
+{
+  "schema": "iwave.redistribution-inventory.v1",
+  "as_of": "2026-11-07",
+  "status": "GPL_SOURCE_AND_KERNEL_CORE_AVAILABLE_FULL_IMAGE_ASSESSMENT_INCOMPLETE",
+  "consumer": "Project release owner deciding the component/source evidence for a complete-image release",
+  "profile": "tch-g62h-imx91-rel3.3",
+  "source_gap_record": "source-gaps.json",
+  "legal_rules": {
+    "unknown_terms_mean_prohibited": false,
+    "additional_permission_for_existing_gpl_rights_required": false,
+    "bit_identical_rebuild_required_by_gpl": false
+  },
+  "components": [
+    {
+      "component": "linux-core-and-project-extensions",
+      "role": "Installed kernel, in-tree modules, Device Tree and maintained changes",
+      "availability": "Public preferred-source snapshot and separately qualified GPL kernel-core binary release containing Image, DTB,807 native and2IMU modules; exact source/configuration references and notices included",
+      "license_evidence": "GPLv2 with applicable per-file licenses and Linux syscall exception",
+      "missing": "Keep preferred modified source/configuration and controlling scripts paired to the actual binary distribution; current archive excludes factory external modules",
+      "supplier_action": "Project release owner maintains scoped source/notices and chosen GPLv2 section 3 delivery route",
+      "additional_gpl_vendor_consent_required": false
+    },
+    {
+      "component": "five-factory-external-modules",
+      "role": "cryptodev, igb_uio, kpage_ncache, mlan and moal",
+      "availability": "Local vendor binaries; pinned public GPL source candidates in three projects",
+      "license_evidence": "Recorded candidate COPYING/LICENSE files and pinned recipes inspected",
+      "missing": "UNKNOWN actual vendor build-source mapping, effective changes/configuration and required generated/staged inputs; no extra patch proved missing",
+      "supplier_action": "iWave BSP/build maintainer confirms mapping and no-extra-change status or supplies actual preferred changes; project owner packages corresponding source",
+      "source_gap_record": "source-gaps.json#/external_modules",
+      "additional_gpl_vendor_consent_required": false
+    },
+    {
+      "component": "uboot-spl-and-recovery-components",
+      "role": "Boot containers, recovery kernel/initramfs and boot scripts distributed in flash bundle",
+      "availability": "Local vendor flash inputs; U-Boot recipe revision b68af07c82eb869537862fc59478f73b0187762e plus twelve patches recorded",
+      "license_evidence": "U-Boot upstream GPLv2 explanation with per-file exceptions; actual container components need mapping",
+      "missing": "Actual complete boot/recovery source/config/scripts and component inventory not assembled by kernel-core package",
+      "supplier_action": "iWave BSP release engineer provides actual source/recipe/config mapping and container inventory; project distributor fulfills applicable source/notice obligations"
+    },
+    {
+      "component": "vendor-library-and-api-headers",
+      "role": "libTelematics.so variants and factory peripheral/runtime support",
+      "availability": "Vendor supplied; two library variants identified; ten separate API headers freshly inspected",
+      "license_evidence": "No SPDX/license/redistribution notices or separate license files found in scoped supplied directory; prior bounded package/license inspection reused",
+      "missing": "UNKNOWN existing terms for intended binary/header distribution channel; no prohibition established",
+      "supplier_action": "iWave library/licensing contact identifies applicable terms; obtain extra grant only if existing rights do not cover intended component use",
+      "source_gap_record": "source-gaps.json#/vendor_runtime_terms"
+    },
+    {
+      "component": "independent-firmware-blobs",
+      "role": "Radio and DDR/boot/other firmware actually included in normal and recovery images",
+      "availability": "Stock metadata identifies twelve firmware-nxp-wifi packages at 1.1-r0 and quectel-firmware at 1.0-r0; boot/recovery firmware remains a separate inventory.",
+      "license_evidence": "UNKNOWN per-file mapping in bounded inspection; a GPL driver does not identify firmware licensing",
+      "missing": "Exact installed file/package/license/EULA/notice mapping, including the named firmware package candidates, and existing applicable conditions. Metadata names do not identify the fitted radio usage or establish licenses.",
+      "supplier_action": "iWave BSP maintainer supplies mapping; identify NXP/radio-vendor grants for the exact files, without a blanket GPL permission gate",
+      "package_inventory": "stock-packages.json#/firmware_labelled_packages"
+    },
+    {
+      "component": "rootfs-userspace",
+      "role": "Normal and recovery utilities, libraries and system services",
+      "availability": "Stock metadata intake records 2720 installed packages from 575 distinct OE recipes in stock-packages.json; normal rootfs only, recovery initramfs separate.",
+      "license_evidence": "0 explicit License fields, 0 Source fields and 0 literal license.manifest/license_image.manifest files. All 2720 records have OE and Architecture; metadata license fields remain UNKNOWN, without inferring package licenses.",
+      "missing": "Version-matched package/license/source mapping for the recorded 575 recipes, actual corresponding source and applicable GPL/LGPL/relinking/notice fulfillment; recovery and manually installed files remain outside dpkg inventory.",
+      "supplier_action": "Attach the safe stock-packages.json to the existing unsent iWave request. Obtain exact recipe/version license/source manifests; the distributor fulfills each identified applicable license.",
+      "package_inventory": "stock-packages.json",
+      "package_counts": {
+        "status_records": 2721,
+        "installed_packages": 2720,
+        "unique_installed_package_names": 2720,
+        "status_explicit_license_entries": 0,
+        "status_license_unknown_packages": 2720,
+        "status_source_field_entries": 0,
+        "status_oe_recipe_references": 2720,
+        "literal_license_manifest_files": 0,
+        "parsed_license_manifest_package_entries": 0,
+        "license_manifest_explicit_license_entries": 0,
+        "distinct_oe_recipe_names": 575,
+        "architecture_field_entries": 2720
+      }
+    },
+    {
+      "component": "dotnet-sdk-and-third-party-components",
+      "role": "Managed SDK and runtimes in neutral base",
+      "availability": "Pinned public Microsoft payload; local LICENSE.txt and ThirdPartyNotices.txt present",
+      "license_evidence": {
+        "sdk_license": "MIT",
+        "license_sha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310",
+        "third_party_notices_sha256": "d30078edf6426ec7ef9427b3048b407fee214d1eb7834a681a3a09290387d591"
+      },
+      "missing": "Retain supplied notices and map any component-specific conditions for the shipped payload",
+      "supplier_action": "Project distributor preserves license/notices and fulfills applicable third-party terms; no blanket new SDK permission request"
+    },
+    {
+      "component": "nxp-uuu-host-utilities",
+      "role": "Host-side USB programming utilities, outside the installed rootfs",
+      "availability": "Public pinned NXP release URLs for Linux ARM64 and x86-64 in host-tools.lock.json",
+      "license_evidence": {
+        "upstream_project_license": "BSD-3-Clause",
+        "source": "https://raw.githubusercontent.com/nxp-imx/mfgtools/uuu_1.5.243/LICENSE",
+        "notice_file": "LICENSES/NXP-UUU-BSD-3-Clause.txt",
+        "sha256": "cc8d47f7b9260f6669ecd41c24554c552f17581d81ee8fc602c6d23edb8bf495"
+      },
+      "missing": "Firmware images are not published. Downstream bundles preserve the NXP notice; dependencies linked into a selected upstream executable remain subject to their own applicable terms.",
+      "supplier_action": "Obtain pinned utilities from NXP. The private bundle builder stages NXP-UUU-LICENSE.txt beside both executables and includes it in checksums and recipient preparation."
+    }
+  ],
+  "source_only_release_scope": "Existing GPL-covered source/patches/tooling may be published with their license conditions; current kernel-core archive explicitly excludes the five factory module sources and is not complete-image source delivery.",
+  "complete_image_status": "NOT_YET_ACCEPTED_COMPONENT_EVIDENCE_INCOMPLETE",
+  "vendor_request": "../../docs/vendor-source-request.md",
+  "contact_status": "NOT_SENT",
+  "stock_package_intake": {
+    "inventory": "stock-packages.json",
+    "status_member_bytes": 1504079,
+    "status_sha256": "c115a02536bc7300676cb0ed46a97686f49aa5564f143fea475d8cd6caf38a03",
+    "installed_packages": 2720,
+    "distinct_oe_recipes": 575,
+    "metadata_license_unknown_packages": 2720,
+    "explicit_license_entries": 0,
+    "source_field_entries": 0,
+    "literal_license_manifests": 0,
+    "scope": "Stock normal-rootfs metadata only, not full SBOM/legal certification; no owner configuration or contact fields published."
+  },
+  "kernel_core_release": {
+    "tag": "v0.2.0-kernel-core",
+    "descriptor": "profiles/tch-g62h-imx91-rel3.3/kernel-core-release.json",
+    "delivered_modules": 809,
+    "missing_factory_module_files": 5,
+    "full_image_included": false,
+    "source_obligations": "Preferred modified Linux and IMU source plus exact config/build references accompany this GPL-covered subset; excluded BSP components retain their separate obligations."
+  }
+}

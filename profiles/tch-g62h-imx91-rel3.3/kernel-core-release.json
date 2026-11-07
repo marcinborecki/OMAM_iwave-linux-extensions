@@ -1,0 +1,30 @@
+{
+  "archive": {
+    "bytes": 27160373,
+    "name": "kernel-core-binaries-6.12.34-tch-rel33.tar.zst",
+    "sha256": "5147427e157d86b10421584452b74d82850c2fa112467efa1358d2269785d851",
+    "url": "https://github.com/marcinborecki/OMAM_iwave-linux-extensions/releases/download/v0.2.0-kernel-core/kernel-core-binaries-6.12.34-tch-rel33.tar.zst"
+  },
+  "delivered_files": 836,
+  "delivered_modules": 809,
+  "delivery_sha256": "552f2c5c79b6a0fc8e9783779afa2098f747f7e3f859b9e0ab52870a255fb3c9",
+  "profile": "tch-g62h-imx91-rel3.3",
+  "restored_modules": 814,
+  "schema": "iwave.kernel-core-release.v1",
+  "scope": "GPL_KERNEL_CORE_ONLY",
+  "source": {
+    "archive": {
+      "bytes": 230766173,
+      "name": "kernel-core-6.12.34-tch-rel33.tar.zst",
+      "sha256": "a249c8e3930d91b0e06ff9a35fcd90fd1ce14159e70707a0347346ae99f0522f",
+      "url": "https://github.com/marcinborecki/OMAM_iwave-linux-extensions/releases/download/v0.1.0-source-only/kernel-core-6.12.34-tch-rel33.tar.zst"
+    },
+    "bundle_tool_sha256": "6a8bb452374ad90073a25ed6a8e039c35f735427e9dbfe7c15e89f6512ad45b0",
+    "public_tools_repository": "https://github.com/marcinborecki/OMAM_iwave-linux-extensions",
+    "scope": "Preferred Linux core and ST IMU sources; the five factory binaries are not delivered",
+    "source_manifest_bytes": 18432045,
+    "source_manifest_sha256": "11d819b4da74eff7ed8cd81517c739d20f08cf69c42b1364fab4e5608a920d9e",
+    "tools_ref": "https://github.com/marcinborecki/OMAM_iwave-linux-extensions/tree/v0.2.0-kernel-core"
+  },
+  "tag": "v0.2.0-kernel-core"
+}
