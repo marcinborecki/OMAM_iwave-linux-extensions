@@ -20,12 +20,6 @@ and FAQ therefore need their mode definitions and measurement conditions reconci
 before sizing a deployment's power budget. This guide uses the table's values as
 reference points and records measured results separately.
 
-The table attaches an optional-feature footnote to power-down, without defining
-whether that means software setup, a commercial option or another condition. That
-footnote establishes no requirement for a different board. The useful engineering
-question is which electrical state the application requests and what current the
-actual board reaches after the transition.
-
 The device-supply current, the charger's battery-current setting and CPU workload
 are different quantities. Keep the measurement point and charging state with each
 result when comparing the operating-mode table to a real installation.
