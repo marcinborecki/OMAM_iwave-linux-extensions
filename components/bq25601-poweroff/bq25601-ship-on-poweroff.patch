@@ -1,0 +1,175 @@
+--- a/drivers/power/supply/bq256xx_charger.c
++++ b/drivers/power/supply/bq256xx_charger.c
+@@ -11,6 +11,7 @@
+ #include <linux/gpio/consumer.h>
+ #include <linux/power_supply.h>
+ #include <linux/regmap.h>
++#include <linux/reboot.h>
+ #include <linux/types.h>
+ #include <linux/usb/phy.h>
+ #include <linux/device.h>
+@@ -247,6 +248,8 @@
+ 	const struct bq256xx_chip_info *chip_info;
+ 	struct bq256xx_state state;
+ 	int watchdog_timer;
++	/* RAM-only, explicit opt-in for one graceful system power-off. */
++	bool ship_mode_on_poweroff;
+ };
+ 
+ /**
+@@ -1270,6 +1273,8 @@
+ {
+ 	switch (reg) {
+ 	case BQ256XX_INPUT_CURRENT_LIMIT:
++	/* BATFET and detection bits can change outside the register cache. */
++	case BQ256XX_CHARGER_CONTROL_3:
+ 	case BQ256XX_CHARGER_STATUS_0...BQ256XX_CHARGER_STATUS_2:
+ 		return true;
+ 	default:
+@@ -1685,6 +1690,130 @@
+ 	return 0;
+ }
+ 
++/* OMAM ship-on-poweroff: TI BQ25601 SLUSCK5A, sections 9.4.4 and 9.6.8. */
++#define BQ25601_BATFET_DIS BIT(5)
++#define BQ25601_BATFET_DLY BIT(3)
++
++static int bq25601_ship_check(struct bq256xx_device *bq)
++{
++	unsigned int part;
++	int ret;
++
++	if (bq->chip_info->model_id != BQ25601)
++		return -EOPNOTSUPP;
++
++	/* Do not mistake the cached register defaults for a silicon identity. */
++	ret = regmap_read_bypassed(bq->regmap, BQ256XX_PART_INFORMATION, &part);
++	if (ret)
++		return ret;
++
++	return (part & GENMASK(6, 3)) == BIT(4) ? 0 : -ENODEV;
++}
++
++static ssize_t ship_mode_on_poweroff_show(struct device *dev,
++		struct device_attribute *attr, char *buf)
++{
++	struct bq256xx_device *bq = dev_get_drvdata(dev);
++	bool armed;
++
++	mutex_lock(&bq->lock);
++	armed = bq->ship_mode_on_poweroff;
++	mutex_unlock(&bq->lock);
++
++	return sysfs_emit(buf, "%u\n", (unsigned int)armed);
++}
++
++static ssize_t ship_mode_on_poweroff_store(struct device *dev,
++		struct device_attribute *attr, const char *buf, size_t count)
++{
++	struct bq256xx_device *bq = dev_get_drvdata(dev);
++	bool armed;
++	int ret;
++
++	ret = kstrtobool(buf, &armed);
++	if (ret)
++		return ret;
++
++	mutex_lock(&bq->lock);
++	if (system_state != SYSTEM_RUNNING) {
++		ret = -ESHUTDOWN;
++	} else {
++		ret = armed ? bq25601_ship_check(bq) : 0;
++		if (!ret)
++			bq->ship_mode_on_poweroff = armed;
++	}
++	mutex_unlock(&bq->lock);
++
++	/* Arming or cancelling does not change BATFET or any charger register. */
++	if (ret)
++		return ret;
++	return count;
++}
++static DEVICE_ATTR_RW(ship_mode_on_poweroff);
++
++static struct attribute *bq25601_ship_attrs[] = {
++	&dev_attr_ship_mode_on_poweroff.attr,
++	NULL,
++};
++
++static const struct attribute_group bq25601_ship_group = {
++	.attrs = bq25601_ship_attrs,
++};
++
++static void bq25601_ship_init(struct bq256xx_device *bq)
++{
++	int ret;
++
++	if (bq25601_ship_check(bq))
++		return;
++
++	ret = devm_device_add_group(bq->dev, &bq25601_ship_group);
++	if (ret)
++		dev_warn(bq->dev, "Ship-on-poweroff control unavailable: %d\n", ret);
++}
++
++static void bq25601_ship_shutdown(struct i2c_client *client)
++{
++	struct bq256xx_device *bq = i2c_get_clientdata(client);
++	unsigned int mask = BQ25601_BATFET_DIS | BQ25601_BATFET_DLY;
++	unsigned int value;
++	bool armed;
++	int ret;
++
++	mutex_lock(&bq->lock);
++	armed = bq->ship_mode_on_poweroff;
++	bq->ship_mode_on_poweroff = false;
++	if (!armed || system_state != SYSTEM_POWER_OFF)
++		goto out;
++
++	ret = bq25601_ship_check(bq);
++	if (ret)
++		goto error;
++
++	/* The I2C client shuts down before its adapter. Only REG07[5,3] change.
++	 * Delayed BATFET disable is the vendor's shipment mode, not an RTC wake.
++	 * REG07 is volatile so this RMW preserves the actual unrelated bits.
++	 */
++	ret = regmap_update_bits(bq->regmap, BQ256XX_CHARGER_CONTROL_3,
++				 mask, mask);
++	if (ret)
++		goto error;
++
++	ret = regmap_read_bypassed(bq->regmap, BQ256XX_CHARGER_CONTROL_3, &value);
++	if (!ret && (value & mask) != mask)
++		ret = -EIO;
++	if (ret)
++		goto error;
++
++	dev_info(bq->dev, "Delayed BATFET disable configured; physical off unconfirmed\n");
++	goto out;
++error:
++	dev_err(bq->dev, "Ship-on-poweroff failed: %d\n", ret);
++out:
++	mutex_unlock(&bq->lock);
++}
++/* End OMAM ship-on-poweroff. */
++
+ static int bq256xx_probe(struct i2c_client *client)
+ {
+ 	const struct i2c_device_id *id = i2c_client_get_device_id(client);
+@@ -1791,6 +1920,7 @@
+ 		dev_info(dev, "Reg 0x07 reset to 0x4C\n");
+ 
+ 
++	bq25601_ship_init(bq);
+ 	return 0;   // <-- IMPORTANT
+ }
+ 
+@@ -1837,6 +1967,7 @@
+ 		.acpi_match_table = bq256xx_acpi_match,
+ 	},
+ 	.probe = bq256xx_probe,
++	.shutdown = bq25601_ship_shutdown,
+ 	.id_table = bq256xx_i2c_ids,
+ };
+ module_i2c_driver(bq256xx_driver);

@@ -1,0 +1,15 @@
+PATCH000.patch
+PATCH001.patch
+PATCH002-iW-PRGTT-R2.0-REL2.1-Linux6.6.52-Acc_gyro.patch
+PATCH003.patch
+PATCH004-iW-PRGTT-R2.0-REL2.2-Linux6.6.52-BLE_update.patch
+PATCH005-iW-PRGTT-R2.0-REL2.3-Linux6.6.52_BR_mode_upadte.patch
+PATCH006-iW-PRGTT-R2.0-REL2.4-Linux6.6.52-BLE_CTS_RTS_as_GPIO.patch
+PATCH007.patch
+PATCH008_A1_CPU_GPIOS_Modified.patch
+PATCH009_Kernel_BSP_Version_Update.patch
+PATCH0010-iG-PRGTT-SC-01-R2.0-REL3.0-Linux6.12.34_Battery_Current_Limit.patch
+PATCH0011-iG-PRGTT-SC-01-R2.0-REL3.1-Linux6.12.34_Battery_Shipment_Mode_Disable.patch
+PATCH0012-Quectel_USB_Serial_Driver_Code.patch
+PATCH0013-iG-PRGTT-SC-01-R2.0-REL3.2-Linux6.12.34-Kernel_BSP_Version_Update.patch
+PATCH0014-iG-PRGTT-SC-01-R2.0-REL3.3-Linux6.12.34-Kernel_BSP_Version_Update.patch

@@ -1,0 +1,84 @@
+OMAM DS-12 patch for st_lsm6dsx_i2c.c (report docs/hardware/iwave/imu-production-path-2026-10-11.md, section 9.4 F1)
+
+Base: linux-imx9-iwave 02cf250c2e6bd375c11dae324ea145a39015d41b, drivers/iio/imu/st_lsm6dsx/st_lsm6dsx_i2c.c
+(sha256 2153bdfecdb45afd95e002a6a5ebb4d07e9357c100221c6dbba13b925029bb1c); applied only to OMAM's module copy.
+
+Rationale: on the iWave BSP the built-in vendor driver st_lsm6dsm requests the IMU interrupt (GPIO3 line 22, DT rising
+edge) as level-high at boot, which re-types the existing mapping. After the vendor unbind the I2C core maps the
+device-tree interrupt again, the IRQ domain refuses it ("irq: type mismatch, failed to map hwirq-22") and the client gets
+no interrupt, so st_lsm6dsx falls back to triggered buffers that cannot deliver data on this kernel (stage 2,
+2026-10-11). When client->irq <= 0, the patch looks up (never creates or changes) the existing mapping of the node's
+first device-tree interrupt on its interrupt parent and passes it to st_lsm6dsx_probe(); it logs one info line. Every
+other case keeps the upstream behaviour. Assumes a two-cell specifier whose first cell is the hwirq (gpio-vf610 uses
+gpiolib's simple domain with irq_domain_xlate_twocell).
+
+Apply in the external module directory with: patch -p5 < this file
+
+--- a/drivers/iio/imu/st_lsm6dsx/st_lsm6dsx_i2c.c
++++ b/drivers/iio/imu/st_lsm6dsx/st_lsm6dsx_i2c.c
+@@ -11,6 +11,9 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/i2c.h>
++#include <linux/irqdomain.h>
++#include <linux/of.h>
++#include <linux/of_irq.h>
+ #include <linux/slab.h>
+ #include <linux/regmap.h>
+ 
+@@ -21,9 +24,41 @@
+ 	.val_bits = 8,
+ };
+ 
++/*
++ * OMAM (DS-12, iWave BSP): the built-in vendor driver requests the IMU interrupt as level-high at boot, which re-types
++ * the existing mapping of its device-tree interrupt. When this driver binds after the vendor unbind, the I2C core
++ * fails to map the device-tree interrupt again ("type mismatch") and passes no interrupt, which would disable the
++ * hardware FIFO path. Reuse the mapping that already exists for the node's first device-tree interrupt on its
++ * interrupt parent. This only looks the mapping up: it never creates or changes a mapping. It assumes a two-cell
++ * specifier whose first cell is the hardware interrupt number (as for gpio-vf610); in every other case it returns 0
++ * and the upstream behaviour (no interrupt) is kept.
++ */
++static int st_lsm6dsx_i2c_existing_irq(struct i2c_client *client)
++{
++	struct device_node *np = client->dev.of_node;
++	struct of_phandle_args spec;
++	struct irq_domain *domain;
++	unsigned int virq = 0;
++
++	if (!np || of_irq_parse_one(np, 0, &spec))
++		return 0;
++
++	domain = irq_find_host(spec.np);
++	if (domain && spec.args_count == 2)
++		virq = irq_find_mapping(domain, spec.args[0]);
++	of_node_put(spec.np);
++
++	if (virq)
++		dev_info(&client->dev,
++			 "OMAM: no interrupt from the I2C core, reusing existing mapping %u (hwirq %u)\n",
++			 virq, spec.args[0]);
++
++	return virq;
++}
++
+ static int st_lsm6dsx_i2c_probe(struct i2c_client *client)
+ {
+-	int hw_id;
++	int hw_id, irq;
+ 	struct regmap *regmap;
+ 
+ 	hw_id = (kernel_ulong_t)device_get_match_data(&client->dev);
+@@ -38,7 +73,11 @@
+ 		return PTR_ERR(regmap);
+ 	}
+ 
+-	return st_lsm6dsx_probe(&client->dev, client->irq, hw_id, regmap);
++	irq = client->irq;
++	if (irq <= 0)
++		irq = st_lsm6dsx_i2c_existing_irq(client);
++
++	return st_lsm6dsx_probe(&client->dev, irq, hw_id, regmap);
+ }
+ 
+ static const struct of_device_id st_lsm6dsx_i2c_of_match[] = {

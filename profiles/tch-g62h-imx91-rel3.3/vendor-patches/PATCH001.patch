@@ -1,0 +1,487 @@
+Upstream-Status: Inappropriate [iwave-specific]
+
+diff -Naur A/arch/arm64/boot/dts/freescale/imx91-iwg50m-osm.dtsi B/arch/arm64/boot/dts/freescale/imx91-iwg50m-osm.dtsi
+--- A/arch/arm64/boot/dts/freescale/imx91-iwg50m-osm.dtsi	2026-01-19 11:21:20.219270978 +0530
++++ B/arch/arm64/boot/dts/freescale/imx91-iwg50m-osm.dtsi	2026-01-19 12:49:41.523736118 +0530
+@@ -88,6 +88,13 @@
+ 		bom_rev = <0>;
+ 		status = "okay";
+ 	};
++	bat: battery {
++                compatible = "simple-battery";
++                constant-charge-current-max-microamp = <2040000>;
++                constant-charge-voltage-max-microvolt = <4352000>;
++                precharge-current-microamp = <180000>;
++                charge-term-current-microamp = <180000>;
++       };
+ };
+ 
+ &lpuart1 { /* console */
+@@ -109,70 +116,6 @@
+ 	status = "okay";
+ };
+ 
+-&eqos {
+-	pinctrl-names = "default", "sleep";
+-	pinctrl-0 = <&pinctrl_eqos>;
+-	pinctrl-1 = <&pinctrl_eqos_sleep>;
+-	phy-mode = "rgmii-id";
+-	phy-handle = <&ethphy1>;
+-	status = "okay";
+-
+-	mdio {
+-		compatible = "snps,dwmac-mdio";
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-		clock-frequency = <5000000>;
+-
+-		ethphy1: ethernet-phy@4 {
+-			compatible = "ethernet-phy-ieee802.3-c22";
+-			reg = <4>;
+-			eee-broken-1000t;
+-			adi,rx-internal-delay-ps = <2000>; /* 2 nano seconds*/
+-            		adi,tx-internal-delay-ps = <2000>;
+-			vddio-supply = <&vddio0>;
+-
+-                        vddio0: vddio-regulator {
+-                                regulator-min-microvolt = <1800000>;
+-                                regulator-max-microvolt = <1800000>;
+-                        };
+-
+-		};
+-	};
+-};
+-
+-&fec {
+-	pinctrl-names = "default", "sleep";
+-	pinctrl-0 = <&pinctrl_fec>;
+-	pinctrl-1 = <&pinctrl_fec_sleep>;
+-	phy-mode = "rgmii-id";
+-	phy-handle = <&ethphy2>;
+-	fsl,magic-packet;
+-	status = "okay";
+-
+-	mdio {
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-		clock-frequency = <5000000>;
+-
+-		ethphy2: ethernet-phy@5 {
+-			compatible = "ethernet-phy-ieee802.3-c22";
+-			reg = <5>;
+-			reset-gpios = <&gpio3 23 GPIO_ACTIVE_LOW>;
+-			reset-assert-us = <10000>;
+-                        reset-deassert-us = <80000>;
+-			eee-broken-1000t;
+-			qca,disable-hibernation-mode;
+-			vddio-supply = <&vddio1>;
+-
+-                        vddio1: vddio-regulator {
+-                                regulator-min-microvolt = <1800000>;
+-                                regulator-max-microvolt = <1800000>;
+-                        };
+-
+-		};
+-	};
+-};
+-
+ &lpm {
+ 	soc-supply = <&buck1>;
+ 	status = "okay";
+@@ -189,23 +132,21 @@
+ 	pinctrl-1 = <&pinctrl_lpi2c1>;
+ 	status = "okay";
+ 
+-	 pcf85263: rtc@51 {
+-                        compatible = "nxp,pcf85263";
+-                        reg = <0x51>;
+-                        pinctrl-names = "default";
+-                        pinctrl-0 = <&pinctrl_pcf85263>;
+-                        interrupt-parent = <&gpio3>;
+-                        interrupts = <20 IRQ_TYPE_LEVEL_LOW>;
+-			wakeup-source;
+-                        status = "okay";
+-        };
+-
+ 	eeprom1: eeprom@50 { /* M24C32-DRDW8TP/K EEPROM */
+                  compatible = "atmel,24c32";
+                  reg = <0x50>;
+                  pagesize = <32>;
+                  status = "okay";
+          };
++	
++	bq25601: bq25601@6b {
++        	 compatible = "ti,bq25601";
++	         reg = <0x6b>;
++        	 monitored-battery = <&bat>;
++	         input-voltage-limit-microvolt = <4500000>;
++	         input-current-limit-microamp = <2400000>;
++
++	};
+ 
+ };
+ 
+@@ -428,85 +369,6 @@
+                 >;
+         };
+ 
+-	pinctrl_eqos: eqosgrp {
+-		fsl,pins = <
+-			MX91_PAD_ENET1_MDC__ENET1_MDC			0x57e
+-			MX91_PAD_ENET1_MDIO__ENET_QOS_MDIO			0x57e
+-			MX91_PAD_ENET1_RD0__ENET_QOS_RGMII_RD0			0x57e
+-			MX91_PAD_ENET1_RD1__ENET_QOS_RGMII_RD1			0x57e
+-			MX91_PAD_ENET1_RD2__ENET_QOS_RGMII_RD2			0x57e
+-			MX91_PAD_ENET1_RD3__ENET_QOS_RGMII_RD3			0x57e
+-			MX91_PAD_ENET1_RXC__ENET_QOS_RGMII_RXC			0x5fe
+-			MX91_PAD_ENET1_RX_CTL__ENET_QOS_RGMII_RX_CTL		0x57e
+-			MX91_PAD_ENET1_TD0__ENET_QOS_RGMII_TD0			0x57e
+-			MX91_PAD_ENET1_TD1__ENET1_RGMII_TD1			0x57e
+-			MX91_PAD_ENET1_TD2__ENET_QOS_RGMII_TD2			0x57e
+-			MX91_PAD_ENET1_TD3__ENET_QOS_RGMII_TD3			0x57e
+-			MX91_PAD_ENET1_TXC__CCM_ENET_QOS_CLOCK_GENERATE_TX_CLK	0x5fe
+-			MX91_PAD_ENET1_TX_CTL__ENET_QOS_RGMII_TX_CTL		0x57e
+-			MX91_PAD_SD3_DATA3__GPIO3_IO25                          0x57e /*ENET_INT*/
+-		>;
+-	};
+-
+-	pinctrl_eqos_sleep: eqosgrpsleep {
+-		fsl,pins = <
+-			MX91_PAD_ENET1_MDC__GPIO4_IO0				0x31e
+-			MX91_PAD_ENET1_MDIO__GPIO4_IO1				0x31e
+-			MX91_PAD_ENET1_RD0__GPIO4_IO10                          0x31e
+-			MX91_PAD_ENET1_RD1__GPIO4_IO11				0x31e
+-			MX91_PAD_ENET1_RD2__GPIO4_IO12				0x31e
+-			MX91_PAD_ENET1_RD3__GPIO4_IO13				0x31e
+-			MX91_PAD_ENET1_RXC__GPIO4_IO9                          0x31e
+-			MX91_PAD_ENET1_RX_CTL__GPIO4_IO8			0x31e
+-			MX91_PAD_ENET1_TD0__GPIO4_IO5                          0x31e
+-			MX91_PAD_ENET1_TD1__GPIO4_IO4                          0x31e
+-			MX91_PAD_ENET1_TD2__GPIO4_IO3				0x31e
+-			MX91_PAD_ENET1_TD3__GPIO4_IO2				0x31e
+-			MX91_PAD_ENET1_TXC__GPIO4_IO7                          0x31e
+-			MX91_PAD_ENET1_TX_CTL__GPIO4_IO6                       0x31e
+-		>;
+-	};
+-
+-	pinctrl_fec: fecgrp {
+-		fsl,pins = <
+-			MX91_PAD_ENET2_MDC__ENET2_MDC			0x57e
+-			MX91_PAD_ENET2_MDIO__ENET2_MDIO			0x57e
+-			MX91_PAD_ENET2_RD0__ENET2_RGMII_RD0		0x57e
+-			MX91_PAD_ENET2_RD1__ENET2_RGMII_RD1		0x57e
+-			MX91_PAD_ENET2_RD2__ENET2_RGMII_RD2		0x57e
+-			MX91_PAD_ENET2_RD3__ENET2_RGMII_RD3		0x57e
+-			MX91_PAD_ENET2_RXC__ENET2_RGMII_RXC		0x5fe
+-			MX91_PAD_ENET2_RX_CTL__ENET2_RGMII_RX_CTL	0x57e
+-			MX91_PAD_ENET2_TD0__ENET2_RGMII_TD0		0x57e
+-			MX91_PAD_ENET2_TD1__ENET2_RGMII_TD1		0x57e
+-			MX91_PAD_ENET2_TD2__ENET2_RGMII_TD2		0x57e
+-			MX91_PAD_ENET2_TD3__ENET2_RGMII_TD3		0x57e
+-			MX91_PAD_ENET2_TXC__ENET2_RGMII_TXC		0x5fe
+-			MX91_PAD_ENET2_TX_CTL__ENET2_RGMII_TX_CTL	0x57e
+-			MX91_PAD_SD3_DATA1__GPIO3_IO23			0x31e /*ENET_Reset_GPIO*/
+-			MX91_PAD_CCM_CLKO4__GPIO4_IO29                  0x57e /*ENET_INT*/
+-		>;
+-	};
+-
+-	pinctrl_fec_sleep: fecsleepgrp {
+-		fsl,pins = <
+-			MX91_PAD_ENET2_MDC__GPIO4_IO14			0x51e
+-			MX91_PAD_ENET2_MDIO__GPIO4_IO15			0x51e
+-			MX91_PAD_ENET2_RD0__GPIO4_IO24			0x51e
+-			MX91_PAD_ENET2_RD1__GPIO4_IO25			0x51e
+-			MX91_PAD_ENET2_RD2__GPIO4_IO26			0x51e
+-			MX91_PAD_ENET2_RD3__GPIO4_IO27			0x51e
+-			MX91_PAD_ENET2_RXC__GPIO4_IO23			0x51e
+-			MX91_PAD_ENET2_RX_CTL__GPIO4_IO22		0x51e
+-			MX91_PAD_ENET2_TD0__GPIO4_IO19			0x51e
+-			MX91_PAD_ENET2_TD1__GPIO4_IO18			0x51e
+-			MX91_PAD_ENET2_TD2__GPIO4_IO17			0x51e
+-			MX91_PAD_ENET2_TD3__GPIO4_IO16			0x51e
+-			MX91_PAD_ENET2_TXC__GPIO4_IO21			0x51e
+-			MX91_PAD_ENET2_TX_CTL__GPIO4_IO20		0x51e
+-		>;
+-	};
+-
+ 	pinctrl_lpi2c1: lpi2c1grp {
+ 		fsl,pins = <
+ 			MX91_PAD_I2C1_SCL__LPI2C1_SCL			0x40000b9e
+@@ -555,6 +417,7 @@
+                 fsl,pins = <
+ 			MX91_PAD_PDM_CLK__CAN1_TX		0x139e
+ 			MX91_PAD_PDM_BIT_STREAM0__CAN1_RX	0x139e
++			MX91_PAD_GPIO_IO16__GPIO2_IO16          0x518  /*CAN1 STANDBY */
+                 >;
+         };
+ 
+@@ -562,6 +425,7 @@
+                 fsl,pins = <
+                         MX91_PAD_GPIO_IO25__CAN2_TX            	0x139e
+                         MX91_PAD_GPIO_IO27__CAN2_RX            	0x139e
++			MX91_PAD_GPIO_IO17__GPIO2_IO17            0x518 /*CAN2 STANDBY */
+                 >;
+         };
+ 
+@@ -639,48 +503,32 @@
+ 
+ 	pinctrl_usdhc2: usdhc2grp {
+ 		fsl,pins = <
+-			MX91_PAD_SD2_CLK__USDHC2_CLK		0x1582
+-			MX91_PAD_SD2_CMD__USDHC2_CMD		0x1382
+ 			MX91_PAD_SD2_DATA0__USDHC2_DATA0	0x1382
+-			MX91_PAD_SD2_DATA1__USDHC2_DATA1	0x1382
+ 			MX91_PAD_SD2_DATA2__USDHC2_DATA2	0x1382
+-			MX91_PAD_SD2_DATA3__USDHC2_DATA3	0x1382
+ 			MX91_PAD_SD2_VSELECT__USDHC2_VSELECT	0x51e
+ 		>;
+ 	};
+ 
+ 	pinctrl_usdhc2_100mhz: usdhc2-100mhzgrp {
+ 		fsl,pins = <
+-			MX91_PAD_SD2_CLK__USDHC2_CLK		0x158e
+-			MX91_PAD_SD2_CMD__USDHC2_CMD		0x138e
+ 			MX91_PAD_SD2_DATA0__USDHC2_DATA0	0x138e
+-			MX91_PAD_SD2_DATA1__USDHC2_DATA1	0x138e
+ 			MX91_PAD_SD2_DATA2__USDHC2_DATA2	0x138e
+-			MX91_PAD_SD2_DATA3__USDHC2_DATA3	0x138e
+ 			MX91_PAD_SD2_VSELECT__USDHC2_VSELECT	0x51e
+ 		>;
+ 	};
+ 
+ 	pinctrl_usdhc2_200mhz: usdhc2-200mhzgrp {
+ 		fsl,pins = <
+-			MX91_PAD_SD2_CLK__USDHC2_CLK		0x15fe
+-			MX91_PAD_SD2_CMD__USDHC2_CMD		0x13fe
+ 			MX91_PAD_SD2_DATA0__USDHC2_DATA0	0x13fe
+-			MX91_PAD_SD2_DATA1__USDHC2_DATA1	0x13fe
+ 			MX91_PAD_SD2_DATA2__USDHC2_DATA2	0x13fe
+-			MX91_PAD_SD2_DATA3__USDHC2_DATA3	0x13fe
+ 			MX91_PAD_SD2_VSELECT__USDHC2_VSELECT	0x51e
+ 		>;
+ 	};
+ 
+ 	pinctrl_usdhc2_sleep: usdhc2grpsleep {
+ 		fsl,pins = <
+-			MX91_PAD_SD2_CLK__GPIO3_IO1            0x51e
+-			MX91_PAD_SD2_CMD__GPIO3_IO2		0x51e
+ 			MX91_PAD_SD2_DATA0__GPIO3_IO3		0x51e
+-			MX91_PAD_SD2_DATA1__GPIO3_IO4		0x51e
+ 			MX91_PAD_SD2_DATA2__GPIO3_IO5		0x51e
+-			MX91_PAD_SD2_DATA3__GPIO3_IO6		0x51e
+ 			MX91_PAD_SD2_VSELECT__GPIO3_IO19	0x51e
+ 		>;
+ 	};
+@@ -689,7 +537,6 @@
+ 		fsl,pins = <
+ 			MX91_PAD_SAI1_TXD0__LPSPI1_SCK                  0x3fe
+ 			MX91_PAD_SAI1_RXD0__LPSPI1_SOUT                 0x3fe
+-			MX91_PAD_SAI1_TXC__LPSPI1_SIN	                0x3fe
+ 		>;
+ 	};
+ 
+diff -Naur A/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts B/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts
+--- A/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts	1970-01-01 05:30:00.000000000 +0530
++++ B/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts	2026-01-19 12:56:21.481344502 +0530
+@@ -0,0 +1,85 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright 2025 iWave Global Pvt Ltd.
++ */
++
++/dts-v1/;
++#include <dt-bindings/pwm/pwm.h>
++#include "imx91-iwg50m-osm.dtsi"
++
++/ {
++	gpio-keys {
++                compatible = "gpio-keys";
++                pinctrl-names = "default";
++                pinctrl-0 = <&pinctrl_gpio_keys>;
++
++                power {
++                        label = "wakeup-gpio";
++                        gpios = <&gpio3 25 0>;
++                        keep-power-in-suspend;
++                        gpio-key,wakeup;
++                        wakeup-source;
++                        linux,code = <29>;
++                };
++        };
++};
++&iomuxc {
++
++	pinctrl-names = "default";
++        pinctrl-0 = <&pinctrl_expansion>;
++
++
++	pinctrl_gpio_keys: gpio_keysgrp {
++                fsl,pins = <
++                        MX91_PAD_SD3_DATA3__GPIO3_IO25           0x51d
++                >;
++        };
++
++	
++	pinctrl_expansion: expansion_pinsgrp {
++                fsl,pins = <
++                        MX91_PAD_SAI1_TXC__GPIO1_IO12                   0x51d
++                        MX91_PAD_CCM_CLKO3__GPIO4_IO28                  0x51d /*cellular PWR KEY */
++                        MX91_PAD_GPIO_IO18__GPIO2_IO18                  0x518 /*DOUT2 */
++                        MX91_PAD_GPIO_IO19__GPIO2_IO19                  0x518 /*cellular switch */
++                        MX91_PAD_ENET1_RD0__GPIO4_IO10                  0x51d /*Assm conf bit 4 */
++                        MX91_PAD_ENET2_RD2__GPIO4_IO26                  0x57d /*cellular USB boot */
++                        /*MX91_PAD_GPIO_IO20__GPIO2_IO20                  0x518*/ /* BR mode enable */
++                        MX91_PAD_GPIO_IO10__GPIO2_IO10                  0x518 /* STATUS LED */
++                        MX91_PAD_GPIO_IO11__GPIO2_IO11                  0x518  /*WIR*/ 
++                        MX91_PAD_GPIO_IO04__GPIO2_IO4                   0x318  /*secure ele */
++                        MX91_PAD_GPIO_IO06__GPIO2_IO6                   0xb98  /*BR enable */
++                        MX91_PAD_GPIO_IO07__GPIO2_IO7                   0xb98  /*3v3 LD0 enable */
++                        MX91_PAD_GPIO_IO08__GPIO2_IO8                   0xb98  /*1v8 LD0 enable */      
++                        MX91_PAD_GPIO_IO00__GPIO2_IO0                   0x518  /*BAT charger CE pin*/
++                        MX91_PAD_SD3_CMD__GPIO3_IO21                    0x51d  /*Load dump */
++                        MX91_PAD_CCM_CLKO4__GPIO4_IO29                  0x57d /*cellular mod emergency off */
++                        MX91_PAD_SD3_DATA1__GPIO3_IO23                  0x51d /*BLE reset */
++                        MX91_PAD_SD3_DATA2__GPIO3_IO24                  0x51d /*Load dump */
++                        MX91_PAD_SD2_CMD__GPIO3_IO2                     0x51d /*cellular status */
++                        MX91_PAD_SD2_CLK__GPIO3_IO1                     0x51d /*Bat charger PG pin */
++                        MX91_PAD_SD2_DATA3__GPIO3_IO6                   0x51d /*Bat charger status */   
++                        MX91_PAD_ENET1_TD0__GPIO4_IO5                   0x51d /*cellular main DTR */ 
++                        MX91_PAD_ENET1_TD1__GPIO4_IO4                   0x51d /*cellular  main DCD */
++                        MX91_PAD_ENET1_TD3__GPIO4_IO2                   0x51d /*cellular reset */
++                        MX91_PAD_ENET1_TX_CTL__GPIO4_IO6                0x51d /*BLE host wake up */
++                        MX91_PAD_ENET1_TXC__GPIO4_IO7                   0x51d /*BLE reset */
++                        MX91_PAD_ENET1_RD1__GPIO4_IO11                  0x51d /*Assm conf bit 5 */      
++                        MX91_PAD_ENET1_RD2__GPIO4_IO12                  0x51d /* BLE FOTA pin 1 */
++                        MX91_PAD_ENET1_RD3__GPIO4_IO13                  0x51d /* BLE FOTA pin 2 */
++                        MX91_PAD_ENET1_RX_CTL__GPIO4_IO8                0x51d /*Assm conf bit 3 */
++                        MX91_PAD_ENET1_RXC__GPIO4_IO9                   0x51d /*Assm conf bit 2 */
++                        MX91_PAD_ENET1_MDIO__GPIO4_IO1                  0x51d /*Assm conf bit 1 */
++                        MX91_PAD_ENET1_MDC__GPIO4_IO0                   0x51d /*Assm conf bit 0 */
++                        MX91_PAD_ENET2_TD2__GPIO4_IO17                  0x51d  /*secure ele 1*/
++                        MX91_PAD_ENET2_TD3__GPIO4_IO16                  0x51d /*secure ele 2*/  
++                        MX91_PAD_ENET2_TX_CTL__GPIO4_IO20               0x51d /*DOUT */
++                        MX91_PAD_ENET2_TXC__GPIO4_IO21                  0x51d   /*DIN */
++                        MX91_PAD_ENET2_RD3__GPIO4_IO27                  0x51d /*BLE additional GPIO1 */
++                        MX91_PAD_ENET2_RX_CTL__GPIO4_IO22               0x51d /*BLE additional GPIO2 */ 
++                        MX91_PAD_SD2_DATA1__GPIO3_IO4                   0x51d
++       /*               MX91_PAD_SD3_DATA3__GPIO3_IO25                  0x51d */
++                >;
++        };
++
++};
+diff -Naur A/arch/arm64/boot/dts/freescale/Makefile B/arch/arm64/boot/dts/freescale/Makefile
+--- A/arch/arm64/boot/dts/freescale/Makefile	2026-01-19 11:21:20.199270376 +0530
++++ B/arch/arm64/boot/dts/freescale/Makefile	2026-01-19 13:53:30.446918464 +0530
+@@ -589,7 +589,8 @@
+ dtb-$(CONFIG_ARCH_MXC) += imx91-9x9-qsb-i2c-spi-slave.dtb
+ dtb-$(CONFIG_ARCH_MXC) += imx91-9x9-qsb-i3c.dtb
+ 
+-dtb-$(CONFIG_ARCH_MXC) += imx91-iwg50m-prgjj.dtb imx91-iwg50m-prgjj-ld.dtb imx91-iwg50m-prgjj-usb-host.dtb imx91-iwg50m-prgjj-41.dtb
++dtb-$(CONFIG_ARCH_MXC) += imx91-iwg50m-prgjj-usb-host.dtb imx91-iwg50m-prgjj-41.dtb
++dtb-$(CONFIG_ARCH_MXC) += imx91-iwg62h-prgtt.dtb
+ 
+ dtb-$(CONFIG_ARCH_MXC) += imx93-iwg50m-prgjj.dtb imx93-iwg50m-prgjj-ld.dtb imx93-iwg50m-prgjj-usb-host.dtb imx93-iwg50m-prgjj-41.dtb imx93-iwg50m-prgjj-rpmsg.dtb
+ dtb-$(CONFIG_ARCH_MXC) += imx943-evk.dtb
+diff -Naur A/arch/arm64/configs/iw_rainbowg50m_defconfig B/arch/arm64/configs/iw_rainbowg50m_defconfig
+--- A/arch/arm64/configs/iw_rainbowg50m_defconfig	2026-01-19 11:21:20.267272426 +0530
++++ B/arch/arm64/configs/iw_rainbowg50m_defconfig	2026-01-19 13:58:01.786877255 +0530
+@@ -166,7 +166,7 @@
+ CONFIG_QRTR_SMD=m
+ CONFIG_QRTR_TUN=m
+ CONFIG_NET_PKTGEN=m
+-CONFIG_CAN=m
++CONFIG_CAN=y
+ CONFIG_BT=y
+ CONFIG_BT_RFCOMM=y
+ CONFIG_BT_RFCOMM_TTY=y
+@@ -366,7 +366,7 @@
+ CONFIG_REALTEK_PHY=y
+ CONFIG_ROCKCHIP_PHY=y
+ CONFIG_VITESSE_PHY=y
+-CONFIG_CAN_FLEXCAN=m
++CONFIG_CAN_FLEXCAN=y
+ CONFIG_MDIO_BITBANG=y
+ CONFIG_MDIO_BUS_MUX_MULTIPLEXER=y
+ CONFIG_MDIO_BUS_MUX_MMIOREG=y
+@@ -377,7 +377,7 @@
+ CONFIG_USB_USBNET=y
+ CONFIG_USB_NET_AX8817X=m
+ CONFIG_USB_NET_AX88179_178A=m
+-CONFIG_USB_NET_CDCETHER=m
++CONFIG_USB_NET_CDCETHER=y
+ CONFIG_USB_NET_CDC_NCM=m
+ CONFIG_USB_NET_DM9601=m
+ CONFIG_USB_NET_SR9800=m
+@@ -514,10 +514,10 @@
+ CONFIG_POWER_RESET_SYSCON=y
+ CONFIG_SYSCON_REBOOT_MODE=y
+ CONFIG_BATTERY_SBS=m
+-CONFIG_BATTERY_BQ27XXX=y
+-CONFIG_BATTERY_MAX17042=m
+-CONFIG_CHARGER_BQ25890=m
+-CONFIG_CHARGER_BQ25980=m
++#CONFIG_BATTERY_BQ27XXX=y
++#CONFIG_BATTERY_MAX17042=m
++#CONFIG_CHARGER_BQ25890=m
++#CONFIG_CHARGER_BQ25980=m
+ CONFIG_SENSORS_ARM_SCMI=y
+ CONFIG_SENSORS_ARM_SCPI=y
+ CONFIG_SENSORS_FP9931=y
+@@ -810,7 +810,7 @@
+ CONFIG_USB_OHCI_HCD_PLATFORM=y
+ CONFIG_USB_HCD_TEST_MODE=y
+ CONFIG_USB_XEN_HCD=y
+-CONFIG_USB_ACM=m
++CONFIG_USB_ACM=y
+ CONFIG_USB_STORAGE=y
+ CONFIG_USB_UAS=y
+ CONFIG_USB_CDNS_SUPPORT=y
+@@ -831,7 +831,7 @@
+ CONFIG_USB_SERIAL_SIMPLE=y
+ CONFIG_USB_SERIAL_CP210X=m
+ CONFIG_USB_SERIAL_FTDI_SIO=y
+-CONFIG_USB_SERIAL_OPTION=m
++CONFIG_USB_SERIAL_OPTION=y
+ CONFIG_USB_TEST=m
+ CONFIG_USB_EHSET_TEST_FIXTURE=y
+ CONFIG_USB_HSIC_USB3503=y
+@@ -1249,3 +1249,27 @@
+ CONFIG_VIDEO_RDACM20=y
+ CONFIG_IMX_ISPMU=m
+ CONFIG_IMX_ISP_REMOTEPROC=m
++
++#Anushree
++CONFIG_USB_PHY=y
++CONFIG_NET_VENDOR_QUALCOMM=y
++CONFIG_USB_NET_DRIVERS=y
++CONFIG_USB_GADGETFS=y
++CONFIG_USB_GADGET_DEBUG=y
++CONFIG_USB_WDM=y
++CONFIG_USB_SERIAL_WWAN=y
++CONFIG_USB_NET_QMI_WWAN=y
++CONFIG_USB_NET_CDC_EEM=y
++#CONFIG_USB_NET_CDC_NCM=y
++CONFIG_PPP=y
++CONFIG_PPP_BSDCOMP=y
++CONFIG_PPP_DEFLATE=y
++CONFIG_PPP_FILTER=y
++CONFIG_PPP_MPPE=y
++CONFIG_PPP_MULTILINK=y
++CONFIG_PPPOE=y
++CONFIG_PPP_ASYNC=y
++CONFIG_PPP_SYNC_TTY=y
++CONFIG_SLIP=m
++CONFIG_SLHC=y
++CONFIG_CHARGER_BQ256XX=y
+diff -Naur A/drivers/usb/serial/option.c B/drivers/usb/serial/option.c
+--- A/drivers/usb/serial/option.c	2026-01-19 11:21:22.739346855 +0530
++++ B/drivers/usb/serial/option.c	2026-01-19 11:33:15.489414404 +0530
+@@ -639,6 +639,8 @@
+ 
+ 
+ static const struct usb_device_id option_ids[] = {
++	/*Anushree*/
++        { USB_DEVICE(0x2C7C, 0x6007) }, /* Quectel EG915Q */
+ 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_COLT) },
+ 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_RICOLA) },
+ 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_RICOLA_LIGHT) },

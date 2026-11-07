@@ -1,0 +1,503 @@
+diff --git a/drivers/net/can/flexcan/Makefile b/drivers/net/can/flexcan/Makefile
+index 89d5695c9..a130bb9e4 100644
+--- a/drivers/net/can/flexcan/Makefile
++++ b/drivers/net/can/flexcan/Makefile
+@@ -5,3 +5,4 @@ obj-$(CONFIG_CAN_FLEXCAN) += flexcan.o
+ flexcan-objs :=
+ flexcan-objs += flexcan-core.o
+ flexcan-objs += flexcan-ethtool.o
++flexcan-objs += flexcan-omam.o
+diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/flexcan/flexcan-core.c
+index 89838bada..e6904cd6f 100644
+--- a/drivers/net/can/flexcan/flexcan-core.c
++++ b/drivers/net/can/flexcan/flexcan-core.c
+@@ -19,6 +19,7 @@
+ #include <linux/firmware/imx/sci.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
++#include <linux/iopoll.h>
+ #include <linux/mfd/syscon.h>
+ #include <linux/module.h>
+ #include <linux/netdevice.h>
+@@ -988,9 +989,22 @@ static struct sk_buff *flexcan_mailbox_read(struct can_rx_offload *offload,
+ 	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_USE_RX_MAILBOX) {
+ 		u32 code;
+ 
+-		do {
+-			reg_ctrl = priv->read(&mb->can_ctrl);
+-		} while (reg_ctrl & FLEXCAN_MB_CODE_RX_BUSY_BIT);
++		if (read_poll_timeout_atomic(priv->read, reg_ctrl,
++					     !(reg_ctrl & FLEXCAN_MB_CODE_RX_BUSY_BIT),
++					     OMAM_FLEXCAN_RX_POLL_DELAY_US,
++					     OMAM_FLEXCAN_RX_POLL_TIMEOUT_US,
++					     false, &mb->can_ctrl)) {
++			/* Stop RX interrupt admission instead of spinning forever in IRQ.
++			 * TX/error handling stays active; status requires reset/reapply.
++			 */
++			priv->rx_mask = 0;
++			priv->write(upper_32_bits(priv->tx_mask), &regs->imask2);
++			priv->write(lower_32_bits(priv->tx_mask), &regs->imask1);
++			atomic_set(&priv->omam.rx_fault, 1);
++			atomic64_inc(&priv->omam.rx_busy_failures);
++			offload->dev->stats.rx_errors++;
++			return NULL;
++		}
+ 
+ 		/* is this MB empty? */
+ 		code = reg_ctrl & FLEXCAN_MB_CODE_MASK;
+@@ -1450,12 +1464,168 @@ static void flexcan_chip_interrupts_disable(const struct net_device *dev)
+ 		    &regs->ctrl);
+ }
+ 
++/* Caller holds the policy lock and the controller is frozen. RX slots are
++ * reconfigured as one complete set; MB0 and the final TX mailbox are untouched.
++ */
++int flexcan_omam_program(struct net_device *dev,
++			 const struct omam_flexcan_request *policy)
++{
++	struct flexcan_priv *priv = netdev_priv(dev);
++	struct flexcan_omam *s = &priv->omam;
++	struct flexcan_regs __iomem *regs = priv->regs;
++	struct omam_flexcan_program program;
++	unsigned int slot, n;
++	u64 rx_mask = 0;
++	int err;
++
++	err = omam_flexcan_compile(policy, s->capacity, &program);
++	if (err)
++		return err;
++	if (!(priv->read(&regs->mcr) & FLEXCAN_MCR_FRZ_ACK))
++		return -EBUSY;
++	s->readback = false;
++	s->applied_mode = OMAM_FLEXCAN_UNAVAILABLE;
++	for (slot = 0; slot < s->capacity; slot++) {
++		struct flexcan_mb __iomem *mb;
++
++		n = priv->offload.mb_first + slot;
++		mb = flexcan_get_mb(priv, n);
++		priv->write(FLEXCAN_MB_CODE_RX_INACTIVE, &mb->can_ctrl);
++		priv->write(program.mask[slot], &regs->rximr[n]);
++		priv->write(program.id[slot], &mb->can_id);
++		priv->write(program.control[slot], &mb->can_ctrl);
++		if (priv->read(&regs->rximr[n]) != program.mask[slot] ||
++		    priv->read(&mb->can_id) != program.id[slot] ||
++		    (priv->read(&mb->can_ctrl) & (FLEXCAN_MB_CODE_MASK |
++			FLEXCAN_MB_CNT_IDE | FLEXCAN_MB_CNT_RTR)) != program.control[slot])
++			return -EIO;
++		if (program.control[slot])
++			rx_mask |= FLEXCAN_IFLAG_MB(n);
++	}
++	flexcan_write64(priv, GENMASK_ULL(priv->offload.mb_last,
++					  priv->offload.mb_first), &regs->iflag1);
++	priv->rx_mask = rx_mask;
++	s->readback = true;
++	s->applied_mode = le32_to_cpu(policy->mode);
++	atomic_set(&s->rx_fault, 0);
++	return 0;
++}
++
++static void flexcan_omam_sync_irqs(struct net_device *dev)
++{
++	struct flexcan_priv *priv = netdev_priv(dev);
++
++	synchronize_irq(dev->irq);
++	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_NR_IRQ_3) {
++		synchronize_irq(priv->irq_boff);
++		synchronize_irq(priv->irq_err);
++	}
++	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SECONDARY_MB_IRQ)
++		synchronize_irq(priv->irq_secondary_mb);
++}
++
++void flexcan_omam_unavailable(struct net_device *dev)
++{
++	struct flexcan_priv *priv = netdev_priv(dev);
++	struct flexcan_omam *s = &priv->omam;
++
++	s->readback = false;
++	s->applied_mode = OMAM_FLEXCAN_UNAVAILABLE;
++	if (netif_running(dev) && !s->suspended) {
++		netif_tx_disable(dev);
++		flexcan_chip_interrupts_disable(dev);
++		flexcan_omam_sync_irqs(dev);
++		flexcan_chip_disable(priv);
++		can_flush_echo_skb(dev);
++		netif_carrier_off(dev);
++		priv->can.state = CAN_STATE_STOPPED;
++	}
++}
++
++static int flexcan_omam_freeze_io(void *context)
++{
++	return flexcan_chip_freeze(netdev_priv((struct net_device *)context));
++}
++
++static int flexcan_omam_program_io(void *context, const struct omam_flexcan_request *policy)
++{
++	return flexcan_omam_program(context, policy);
++}
++
++static int flexcan_omam_unfreeze_io(void *context)
++{
++	return flexcan_chip_unfreeze(netdev_priv((struct net_device *)context));
++}
++
++static const struct omam_flexcan_io flexcan_omam_io = {
++	.freeze = flexcan_omam_freeze_io,
++	.program = flexcan_omam_program_io,
++	.unfreeze = flexcan_omam_unfreeze_io,
++};
++
++int flexcan_omam_apply(struct net_device *dev,
++		       const struct omam_flexcan_request *policy)
++{
++	struct flexcan_priv *priv = netdev_priv(dev);
++	struct flexcan_omam *s = &priv->omam;
++	int err;
++
++	if (s->suspended)
++		return -EBUSY;
++	if (!netif_running(dev)) {
++		s->readback = false;
++		s->applied_mode = OMAM_FLEXCAN_UNAVAILABLE;
++		s->recovery = OMAM_FLEXCAN_RECOVERY_NONE;
++		s->last_error = 0;
++		return 0; /* Commit the desired policy; open reapplies before readiness. */
++	}
++	if (priv->can.state >= CAN_STATE_BUS_OFF)
++		return -EBUSY;
++
++	netif_tx_disable(dev);
++	flexcan_chip_interrupts_disable(dev);
++	flexcan_omam_sync_irqs(dev);
++	/* An in-flight TX IRQ may have woken the queue during synchronization. */
++	netif_tx_disable(dev);
++	if (priv->can.state >= CAN_STATE_BUS_OFF || priv->can.echo_skb[0] ||
++	    (priv->read(&priv->tx_mb->can_ctrl) & FLEXCAN_MB_CODE_MASK) !=
++	    FLEXCAN_MB_CODE_TX_INACTIVE) {
++		flexcan_chip_interrupts_enable(dev);
++		if (!priv->can.echo_skb[0] && priv->can.state < CAN_STATE_BUS_OFF)
++			netif_wake_queue(dev);
++		return -EBUSY; /* Never abort a pending command to replace an RX policy. */
++	}
++	can_rx_offload_disable(&priv->offload);
++	s->gaps++;
++	/* All IRQ and NAPI writers are quiescent. Queued old-generation frames may
++	 * not leak through after the response. The gap counter records this loss.
++	 */
++	skb_queue_purge(&priv->offload.skb_queue);
++	__skb_queue_purge(&priv->offload.skb_irq_queue);
++	err = omam_flexcan_transition(&flexcan_omam_io, dev, policy, &s->policy, &s->recovery);
++	s->last_error = err;
++	if (s->recovery == OMAM_FLEXCAN_RECOVERY_ACCEPT_ALL) {
++		memset(&s->policy, 0, sizeof(s->policy));
++		s->identity.policy_generation++;
++	}
++	if (s->recovery == OMAM_FLEXCAN_RECOVERY_UNAVAILABLE) {
++		flexcan_omam_unavailable(dev);
++		can_rx_offload_enable(&priv->offload);
++		return err;
++	}
++	can_rx_offload_enable(&priv->offload);
++	flexcan_chip_interrupts_enable(dev);
++	if (priv->can.state < CAN_STATE_BUS_OFF)
++		netif_wake_queue(dev);
++	return err;
++}
++
+ /* flexcan_chip_start
+  *
+  * this functions is entered with clocks enabled
+  *
+  */
+-static int flexcan_chip_start(struct net_device *dev)
++static int flexcan_chip_start_locked(struct net_device *dev)
+ {
+ 	struct flexcan_priv *priv = netdev_priv(dev);
+ 	struct flexcan_regs __iomem *regs = priv->regs;
+@@ -1463,6 +1633,9 @@ static int flexcan_chip_start(struct net_device *dev)
+ 	int err, i;
+ 	struct flexcan_mb __iomem *mb;
+ 
++	priv->omam.readback = false;
++	priv->omam.applied_mode = OMAM_FLEXCAN_UNAVAILABLE;
++
+ 	/* enable module */
+ 	err = flexcan_chip_enable(priv);
+ 	if (err)
+@@ -1672,6 +1845,10 @@ static int flexcan_chip_start(struct net_device *dev)
+ 		priv->write(reg_ctrl2, &regs->ctrl2);
+ 	}
+ 
++	err = flexcan_omam_reapply(dev);
++	if (err)
++		goto out_chip_disable;
++
+ 	/* synchronize with the can bus */
+ 	err = flexcan_chip_unfreeze(priv);
+ 	if (err)
+@@ -1686,10 +1863,25 @@ static int flexcan_chip_start(struct net_device *dev)
+ 	return 0;
+ 
+  out_chip_disable:
++	priv->omam.readback = false;
++	priv->omam.applied_mode = OMAM_FLEXCAN_UNAVAILABLE;
++	priv->omam.last_error = err;
+ 	flexcan_chip_disable(priv);
+ 	return err;
+ }
+ 
++static int flexcan_chip_start(struct net_device *dev)
++{
++	struct flexcan_priv *priv = netdev_priv(dev);
++	int err;
++
++	mutex_lock(&priv->omam.lock);
++	priv->omam.closing = false;
++	err = flexcan_chip_start_locked(dev);
++	mutex_unlock(&priv->omam.lock);
++	return err;
++}
++
+ /* __flexcan_chip_stop
+  *
+  * this function is entered with clocks enabled
+@@ -1816,6 +2008,13 @@ static int flexcan_close(struct net_device *dev)
+ {
+ 	struct flexcan_priv *priv = netdev_priv(dev);
+ 
++	mutex_lock(&priv->omam.lock);
++	priv->omam.closing = true;
++	mutex_unlock(&priv->omam.lock);
++	cancel_delayed_work_sync(&priv->can.restart_work);
++	mutex_lock(&priv->omam.lock);
++	priv->omam.readback = false;
++	priv->omam.applied_mode = OMAM_FLEXCAN_UNAVAILABLE;
+ 	netif_stop_queue(dev);
+ 	flexcan_chip_interrupts_disable(dev);
+ 
+@@ -1833,6 +2032,7 @@ static int flexcan_close(struct net_device *dev)
+ 
+ 	can_rx_offload_del(&priv->offload);
+ 	flexcan_transceiver_disable(priv);
++	mutex_unlock(&priv->omam.lock);
+ 	close_candev(dev);
+ 
+ 	pm_runtime_put(priv->dev);
+@@ -1842,24 +2042,19 @@ static int flexcan_close(struct net_device *dev)
+ 
+ static int flexcan_set_mode(struct net_device *dev, enum can_mode mode)
+ {
++	struct flexcan_priv *priv = netdev_priv(dev);
+ 	int err;
+ 
+-	switch (mode) {
+-	case CAN_MODE_START:
+-		err = flexcan_chip_start(dev);
+-		if (err)
+-			return err;
+-
++	if (mode != CAN_MODE_START)
++		return -EOPNOTSUPP;
++	mutex_lock(&priv->omam.lock);
++	err = priv->omam.closing ? -ENETDOWN : flexcan_chip_start_locked(dev);
++	if (!err) {
+ 		flexcan_chip_interrupts_enable(dev);
+-
+ 		netif_wake_queue(dev);
+-		break;
+-
+-	default:
+-		return -EOPNOTSUPP;
+ 	}
+-
+-	return 0;
++	mutex_unlock(&priv->omam.lock);
++	return err;
+ }
+ 
+ static const struct net_device_ops flexcan_netdev_ops = {
+@@ -2239,6 +2434,7 @@ static int flexcan_probe(struct platform_device *pdev)
+ 	pm_runtime_set_active(&pdev->dev);
+ 	pm_runtime_enable(&pdev->dev);
+ 
++	flexcan_omam_init(dev);
+ 	err = register_flexcandev(dev);
+ 	if (err) {
+ 		dev_err(&pdev->dev, "registering netdev failed\n");
+@@ -2252,6 +2448,7 @@ static int flexcan_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	of_can_transceiver(dev);
++	flexcan_omam_register(dev);
+ 
+ 	return 0;
+ 
+@@ -2269,6 +2466,7 @@ static void flexcan_remove(struct platform_device *pdev)
+ {
+ 	struct net_device *dev = platform_get_drvdata(pdev);
+ 
++	flexcan_omam_unregister(dev);
+ 	device_set_wakeup_enable(&pdev->dev, false);
+ 	device_set_wakeup_capable(&pdev->dev, false);
+ 	unregister_flexcandev(dev);
+@@ -2276,13 +2474,16 @@ static void flexcan_remove(struct platform_device *pdev)
+ 	free_candev(dev);
+ }
+ 
+-static int __maybe_unused flexcan_suspend(struct device *device)
++static int flexcan_suspend_locked(struct device *device)
+ {
+ 	struct net_device *dev = dev_get_drvdata(device);
+ 	struct flexcan_priv *priv = netdev_priv(dev);
+ 	int err;
+ 
+ 	if (netif_running(dev)) {
++		netif_tx_disable(dev);
++		if (priv->can.echo_skb[0])
++			return -EBUSY;
+ 		/* if wakeup is enabled, enter stop mode
+ 		 * else enter disabled mode.
+ 		 */
+@@ -2315,20 +2516,31 @@ static int __maybe_unused flexcan_suspend(struct device *device)
+ 	return 0;
+ }
+ 
+-static int __maybe_unused flexcan_resume(struct device *device)
++static int flexcan_resume_locked(struct device *device)
+ {
+ 	struct net_device *dev = dev_get_drvdata(device);
+ 	struct flexcan_priv *priv = netdev_priv(dev);
+ 	int err;
+ 
+ 	if (netif_running(dev)) {
+-		netif_device_attach(dev);
+-		netif_start_queue(dev);
+ 		if (device_may_wakeup(device)) {
+ 			disable_irq_wake(dev->irq);
+ 			err = flexcan_exit_stop_mode(priv);
+ 			if (err)
+ 				return err;
++			/* Reapply even after stop mode: a departed owner may have been
++			 * cleared while the device was suspended.
++			 */
++			flexcan_chip_interrupts_disable(dev);
++			flexcan_omam_sync_irqs(dev);
++			can_rx_offload_disable(&priv->offload);
++			skb_queue_purge(&priv->offload.skb_queue);
++			__skb_queue_purge(&priv->offload.skb_irq_queue);
++			err = flexcan_chip_start_locked(dev);
++			can_rx_offload_enable(&priv->offload);
++			if (err)
++				return err;
++			flexcan_chip_interrupts_enable(dev);
+ 		} else {
+ 			err = pinctrl_pm_select_default_state(device);
+ 			if (err)
+@@ -2338,7 +2550,7 @@ static int __maybe_unused flexcan_resume(struct device *device)
+ 			if (err)
+ 				return err;
+ 
+-			err = flexcan_chip_start(dev);
++			err = flexcan_chip_start_locked(dev);
+ 			if (err) {
+ 				flexcan_transceiver_disable(priv);
+ 				return err;
+@@ -2348,11 +2560,50 @@ static int __maybe_unused flexcan_resume(struct device *device)
+ 		}
+ 
+ 		priv->can.state = CAN_STATE_ERROR_ACTIVE;
++		netif_device_attach(dev);
++		netif_start_queue(dev);
+ 	}
+ 
+ 	return 0;
+ }
+ 
++static int __maybe_unused flexcan_suspend(struct device *device)
++{
++	struct net_device *dev = dev_get_drvdata(device);
++	struct flexcan_priv *priv = netdev_priv(dev);
++	int err;
++
++	mutex_lock(&priv->omam.lock);
++	err = flexcan_suspend_locked(device);
++	if (!err) {
++		priv->omam.suspended = true;
++	} else if (err != -EBUSY) {
++		priv->omam.last_error = err;
++		priv->omam.recovery = OMAM_FLEXCAN_RECOVERY_UNAVAILABLE;
++		flexcan_omam_unavailable(dev);
++	}
++	mutex_unlock(&priv->omam.lock);
++	return err;
++}
++
++static int __maybe_unused flexcan_resume(struct device *device)
++{
++	struct net_device *dev = dev_get_drvdata(device);
++	struct flexcan_priv *priv = netdev_priv(dev);
++	int err;
++
++	mutex_lock(&priv->omam.lock);
++	priv->omam.suspended = false;
++	err = flexcan_resume_locked(device);
++	if (err) {
++		priv->omam.readback = false;
++		priv->omam.applied_mode = OMAM_FLEXCAN_UNAVAILABLE;
++		priv->omam.last_error = err;
++	}
++	mutex_unlock(&priv->omam.lock);
++	return err;
++}
++
+ static int __maybe_unused flexcan_runtime_suspend(struct device *device)
+ {
+ 	struct net_device *dev = dev_get_drvdata(device);
+@@ -2439,7 +2690,25 @@ static struct platform_driver flexcan_driver = {
+ 	.id_table = flexcan_id_table,
+ };
+ 
+-module_platform_driver(flexcan_driver);
++static int __init flexcan_driver_init(void)
++{
++	int err = flexcan_omam_family_init();
++
++	if (err)
++		return err;
++	err = platform_driver_register(&flexcan_driver);
++	if (err)
++		flexcan_omam_family_exit();
++	return err;
++}
++module_init(flexcan_driver_init);
++
++static void __exit flexcan_driver_exit(void)
++{
++	platform_driver_unregister(&flexcan_driver);
++	flexcan_omam_family_exit();
++}
++module_exit(flexcan_driver_exit);
+ 
+ MODULE_AUTHOR("Sascha Hauer <kernel@pengutronix.de>, "
+ 	      "Marc Kleine-Budde <kernel@pengutronix.de>");
+diff --git a/drivers/net/can/flexcan/flexcan.h b/drivers/net/can/flexcan/flexcan.h
+index 2cf886618..9f0cc8aa1 100644
+--- a/drivers/net/can/flexcan/flexcan.h
++++ b/drivers/net/can/flexcan/flexcan.h
+@@ -15,6 +15,7 @@
+ #define _FLEXCAN_H
+ 
+ #include <linux/can/rx-offload.h>
++#include "flexcan-omam.h"
+ 
+ /* FLEXCAN hardware feature flags
+  *
+@@ -88,6 +89,7 @@ struct flexcan_stop_mode {
+ struct flexcan_priv {
+ 	struct can_priv can;
+ 	struct can_rx_offload offload;
++	struct flexcan_omam omam;
+ 	struct device *dev;
+ 
+ 	struct flexcan_regs __iomem *regs;

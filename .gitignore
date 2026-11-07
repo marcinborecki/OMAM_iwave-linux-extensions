@@ -1,0 +1,6 @@
+# Local source/build/image inputs and generated artifacts are not Git content.
+.local/
+artifacts/
+__pycache__/
+.pytest_cache/
+*.pyc

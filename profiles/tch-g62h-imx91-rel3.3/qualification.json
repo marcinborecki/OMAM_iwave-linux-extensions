@@ -1,0 +1,45 @@
+{
+  "schema": "iwave.profile-qualification.v1",
+  "profile": "tch-g62h-imx91-rel3.3",
+  "recorded_on": "2026-11-07",
+  "neutral_base": {
+    "rootfs_sha256": "985064489c68b676a3d0ccfeb24bd4b31510bc06dad71f2aa764f8c1bbfcb33e",
+    "base_manifest_sha256": "97c2b035ec0b8958f2e59dc1a582690f8eb39762606cbe0cd070a207142ed35e",
+    "kernel_release": "6.12.34-omam-rel33-policy1",
+    "modules": {
+      "native": 807,
+      "preserved_factory_external": 5,
+      "upstream_imu": 2,
+      "total": 814
+    },
+    "sdk": "11.0.100-rc.3.26522.148",
+    "runtime": "11.0.0-rc.3.26522.148",
+    "content_verification": "PASS",
+    "boot_connections": "STATIC_CHECK_PASS",
+    "private_additive_consumer": "ACTUAL_COMPOSE_AND_INDEPENDENT_COMPARE_PASS"
+  },
+  "checks": {
+    "native_and_kernel_tool_cases": {
+      "passed": 65,
+      "failed": 0,
+      "skipped": 0,
+      "evidence": "executed after standalone extraction; unchanged C/patch/UAPI sources"
+    },
+    "public_image_and_kernel_python_cases": {
+      "passed": 41,
+      "failed": 0,
+      "skipped": 0,
+      "evidence": "renewed after final BQ25601 diagnostic wording"
+    },
+    "real_image_exports_vs_module_symvers": {
+      "matched": 16967,
+      "status": "PASS"
+    },
+    "full_kernel_build": "REUSED_ORIGINAL_SAME_SOURCE_AND_BINARY_IDENTITIES; public build CLI not rerun"
+  },
+  "physical_boot": "NOT_RUN",
+  "can_traffic": "NOT_RUN",
+  "power_current_and_wake": "NOT_RUN",
+  "imu_buffered_samples": "NOT_RUN",
+  "binary_redistribution": "BLOCKED_PENDING_EXTERNAL_SOURCE_CORRESPONDENCE_AND_VENDOR_TERMS"
+}

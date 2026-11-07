@@ -1,0 +1,11 @@
+{
+  "schema": "iwave.dotnet-rc-verification.v1",
+  "checked_date": "2026-11-07",
+  "metadata": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/11.0/releases.json",
+  "latest_sdk": "11.0.100-rc.3.26522.148",
+  "latest_release_date": "2026-10-25",
+  "runtime": "11.0.0-rc.3.26522.148",
+  "rid": "linux-arm64",
+  "sha512": "e8788cba187792a64bdc5493da4c29066070f3996b0d7899d4f4ace2f76f7f101217e88834522394aa00e306f1c9506faf74f5cd2379fbee314b00ac8f34bb5b",
+  "selection": "Latest published .NET 11 RC in official metadata; existing profile pin unchanged"
+}

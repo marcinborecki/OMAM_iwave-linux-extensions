@@ -1,0 +1,11 @@
+The kernel extensions and original project tooling in this repository are
+licensed under the GNU General Public License, version 2 only (GPL-2.0-only),
+unless a file explicitly states another compatible license or exception.
+
+The complete GPL text is in LICENSES/GPL-2.0-only.txt. Existing upstream notices
+and per-file SPDX identifiers remain authoritative. The Linux UAPI header retains
+the GPL-2.0 WITH Linux-syscall-note exception; its text is included in LICENSES/.
+
+This grant covers the source project. It does not relicense separately acquired
+vendor firmware, libraries, toolchains or other local build inputs. Those files
+are excluded from Git and retain their own terms.

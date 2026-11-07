@@ -1,0 +1,36 @@
+{
+  "schema": "iwave.image-profile.v1",
+  "profile": "tch-g62h-imx91-rel3.3",
+  "kernel_release": "6.12.34-omam-rel33-policy1",
+  "kernel_manifest_sha256": "1b1ac8180bda010cc391eee4296d1804edccc7d3ce8627baf2c056f6694ff2ec",
+  "kernel_outputs": {
+    "Image": {
+      "bytes": 35600896,
+      "sha256": "2077497c2a013217b70bbdde3afa0a680c42cdb9eb3c572a9ca1d698ddec86b8"
+    },
+    "imx91-iwg62h-prgtt.dtb": {
+      "bytes": 36118,
+      "sha256": "8618139cc10e942d9863903ea87b9247c2e009e702f1e425414f4afab86e9bb2"
+    },
+    "config": {
+      "bytes": 257224,
+      "sha256": "77a020fd339b28333113bd317e62286ce5b9073460ed905eff5bb16b22d37920"
+    },
+    "Module.symvers": {
+      "bytes": 1146533,
+      "sha256": "5c1bc72d9c38c735a2caa1fa4bba6a6d2feea6625b84115cd66b85b9e82e23ef"
+    },
+    "System.map": {
+      "bytes": 5551907,
+      "sha256": "25a277974bccfb0a5f0207897731cf359b61305ce0a0e2aed0c4a8f0da9112eb"
+    },
+    "module-symbols.symvers": {
+      "bytes": 1188871,
+      "sha256": "be980967e0270354fec245dfb1901cd3aba0c102fcd666b2245f8ad7511ef9d7"
+    }
+  },
+  "sdk_tree_sha256": "fdd2e5694cff09a503cbc48373b8056826835a0d0db1f3517a0da7882927cd3e",
+  "sdk_host_version": "11.0.100-rc.3.26522.148",
+  "qualification": "PASS_BUILD_AND_STATIC_ABI",
+  "physical_acceptance": "NOT_RUN"
+}

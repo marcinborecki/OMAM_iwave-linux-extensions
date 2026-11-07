@@ -1,0 +1,48 @@
+Upstream-Status: Inappropriate [iwave-specific]
+
+diff -Naur A/drivers/iio/adc/imx93_adc.c B/drivers/iio/adc/imx93_adc.c
+--- A/drivers/iio/adc/imx93_adc.c	2026-01-20 14:04:54.987184044 +0530
++++ B/drivers/iio/adc/imx93_adc.c	2026-01-20 14:43:25.057380550 +0530
+@@ -159,6 +159,18 @@
+ 	mcr &= ~FIELD_PREP(IMX93_ADC_MCR_ADCLKSE_MASK, 1);
+ 	writel(mcr, adc->regs + IMX93_ADC_MCR);
+ 
++/* Not sure which value is proper count, start from zero. */
++	u8 bndflcnt = 0;
++recalibration:
++	mcr = readl(adc->regs + IMX93_ADC_CALCFG0);
++	dev_info(adc->dev, "IMX93_ADC_CALCFG0=0x%x - previous\n", mcr);
++	mcr &= ~(0xF << 8);
++	mcr |= (bndflcnt << 8);
++	writel(mcr, adc->regs + IMX93_ADC_CALCFG0);
++	mcr = readl(adc->regs + IMX93_ADC_CALCFG0);
++	dev_info(adc->dev, "IMX93_ADC_CALCFG0=0x%x, bndflcnt=%d\n", mcr, bndflcnt);
++	bndflcnt++;
++
+ 	imx93_adc_power_up(adc);
+ 
+ 	/* Enable loading of calibrated values even in fail condition */
+@@ -187,14 +199,15 @@
+ 
+ 	/* check whether calbration is success or not */
+ 	msr = readl(adc->regs + IMX93_ADC_MSR);
+-	if (msr & IMX93_ADC_MSR_CALFAIL_MASK)
+-		/*
+-		 * Only give warning here, this means the noise of the
+-		 * reference voltage do not meet the requirement:
+-		 *     ADC reference voltage Noise < 1.8V * 1/2^ENOB
+-		 * And the reault of ADC is not that accurate.
+-		 */
+-		dev_warn(adc->dev, "ADC calibration failed!\n");
++	if (msr & IMX93_ADC_MSR_CALFAIL_MASK) {
++	        dev_warn(adc->dev, "ADC calibration failed!\n");
++	        imx93_adc_power_down(adc);
++	        goto recalibration;
++        	return -EAGAIN;
++	}
++	else {
++	        dev_info(adc->dev, "ADC calibration success!\n");
++	}
+ 
+ 	return 0;
+ }

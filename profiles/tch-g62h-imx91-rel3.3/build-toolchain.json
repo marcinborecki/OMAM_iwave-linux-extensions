@@ -1,0 +1,70 @@
+{
+  "schema": "iwave.build-toolchain.v1",
+  "host_architecture": "aarch64",
+  "compiler": "aarch64-linux-gnu-gcc-14 (Ubuntu 14.3.0-14ubuntu1) 14.3.0",
+  "compiler_sha256": "967516fc540035576fd171bc0fe72f9c97f441d94890a53c2196803d325b5fe3",
+  "original_toolchain_receipt_sha256": "7f937e137191b6c5daddfab5de0c9d040b338254792adeee3c055e1b6cae97dc",
+  "versions": {
+    "flex": "flex 2.6.4",
+    "bison": "bison (GNU Bison) 3.8.2",
+    "m4": "m4 (GNU M4) 1.4.21"
+  },
+  "packages": [
+    {
+      "deb": "bison_2%3a3.8.2+dfsg-1ubuntu0.26.04.1_arm64.deb",
+      "bytes": 737728,
+      "sha256": "3f28d2ce654c9ef076895324814694cf63898e056f5fb7bf1f43af2cd0ddf59b",
+      "metadata": "Package: bison\nVersion: 2:3.8.2+dfsg-1ubuntu0.26.04.1\nArchitecture: arm64"
+    },
+    {
+      "deb": "cpp-14-aarch64-linux-gnu_14.3.0-14ubuntu1_arm64.deb",
+      "bytes": 10642100,
+      "sha256": "fbf2f61453efe092bf5042daf8092443e32efacb8b6314e7008b8f12d0ab0e2a",
+      "metadata": "Package: cpp-14-aarch64-linux-gnu\nVersion: 14.3.0-14ubuntu1\nArchitecture: arm64"
+    },
+    {
+      "deb": "flex_2.6.4-8.2build2_arm64.deb",
+      "bytes": 289176,
+      "sha256": "f27e22062bdf1e4bd4f88d8b6ba1c146960cde582816e092154424cbb1c30f50",
+      "metadata": "Package: flex\nVersion: 2.6.4-8.2build2\nArchitecture: arm64"
+    },
+    {
+      "deb": "gcc-14-aarch64-linux-gnu_14.3.0-14ubuntu1_arm64.deb",
+      "bytes": 20920006,
+      "sha256": "65d04e02e20950b26ec9efab7c06ac8061d42b638504ad40b768eb09bdbf01a3",
+      "metadata": "Package: gcc-14-aarch64-linux-gnu\nVersion: 14.3.0-14ubuntu1\nArchitecture: arm64"
+    },
+    {
+      "deb": "gcc-14-base_14.3.0-14ubuntu1_arm64.deb",
+      "bytes": 36306,
+      "sha256": "fed53662bd84cc74ec4aa696269c529b29e1572eb09732814b6a5a22e3b92312",
+      "metadata": "Package: gcc-14-base\nVersion: 14.3.0-14ubuntu1\nArchitecture: arm64"
+    },
+    {
+      "deb": "libelf-dev_0.194-4_arm64.deb",
+      "bytes": 119114,
+      "sha256": "4a0b597340d8cc2692586fc03ad3d0a379b90ba5942385a5c4fc129683124c5f",
+      "metadata": "Package: libelf-dev\nVersion: 0.194-4\nArchitecture: arm64"
+    },
+    {
+      "deb": "libelf1t64_0.194-4_arm64.deb",
+      "bytes": 57408,
+      "sha256": "2cb6cbc4045b07ff9deff1a8bc29d855e11a5ad09e0f532206698ffb74b29634",
+      "metadata": "Package: libelf1t64\nVersion: 0.194-4\nArchitecture: arm64"
+    },
+    {
+      "deb": "libgcc-14-dev_14.3.0-14ubuntu1_arm64.deb",
+      "bytes": 2592026,
+      "sha256": "ce4f179797f4621862b0de19f9181628d944ac132a3e718745e54fbf0e0c8191",
+      "metadata": "Package: libgcc-14-dev\nVersion: 14.3.0-14ubuntu1\nArchitecture: arm64"
+    },
+    {
+      "deb": "m4_1.4.21-1_arm64.deb",
+      "bytes": 215830,
+      "sha256": "cd142fdc5a7f85a70f9552e1e272f6ed41b157e08ef5e52adb3c7eb197637bc5",
+      "metadata": "Package: m4\nVersion: 1.4.21-1\nArchitecture: arm64"
+    }
+  ],
+  "distribution_scope": "Package identities only; no compiler binaries, host paths or private receipt exported",
+  "reproducibility": "Exact source/input identity recorded; repeated byte-identical build not claimed"
+}

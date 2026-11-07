@@ -1,0 +1,560 @@
+Upstream-Status: Inappropriate [iwave-specific]
+
+diff -Naur A/arch/arm64/boot/dts/freescale/imx91-iwg50m-osm.dtsi B/arch/arm64/boot/dts/freescale/imx91-iwg50m-osm.dtsi
+--- A/arch/arm64/boot/dts/freescale/imx91-iwg50m-osm.dtsi	2026-01-14 16:11:39.000000000 +0530
++++ B/arch/arm64/boot/dts/freescale/imx91-iwg50m-osm.dtsi	2026-01-16 14:07:53.334154961 +0530
+@@ -147,7 +147,7 @@
+ 	phy-mode = "rgmii-id";
+ 	phy-handle = <&ethphy2>;
+ 	fsl,magic-packet;
+-	status = "disabled";
++	status = "okay";
+ 
+ 	mdio {
+ 		#address-cells = <1>;
+@@ -184,8 +184,9 @@
+  */
+ &lpi2c1 {
+ 	clock-frequency = <400000>;
+-	pinctrl-names = "default";
++	pinctrl-names = "default", "sleep";
+ 	pinctrl-0 = <&pinctrl_lpi2c1>;
++	pinctrl-1 = <&pinctrl_lpi2c1>;
+ 	status = "okay";
+ 
+ 	 pcf85263: rtc@51 {
+@@ -210,8 +211,9 @@
+ 
+ &lpi2c2 {
+ 	clock-frequency = <400000>;
+-	pinctrl-names = "default";
++	pinctrl-names = "default", "sleep";
+ 	pinctrl-0 = <&pinctrl_lpi2c2>;
++	pinctrl-1 = <&pinctrl_lpi2c2>;
+ 	status = "okay";
+ 
+         touchscreen@38 {
+@@ -307,35 +309,51 @@
+         pinctrl-names = "default";
+         pinctrl-0 = <&pinctrl_flexcan1>;
+         xceiver-supply = <&reg_can1_stby>;
+-        status = "disabled";
++        status = "okay";
+ };
+ 
+ &flexcan2 { /* CAN: FLEXCAN2 */
+         pinctrl-names = "default";
+         pinctrl-0 = <&pinctrl_flexcan2>;
+         xceiver-supply = <&reg_can2_stby>;
+-        status = "disabled";
++        status = "okay";
++};
++
++&lpuart1 { /* console */
++       pinctrl-names = "default";
++       pinctrl-0 = <&pinctrl_uart1>;
++       status = "okay";
+ };
+ 
+ &lpuart2 { /* UART2: Data UART */
+         pinctrl-names = "default";
+         pinctrl-0 = <&pinctrl_uart2>;
+-        status = "disabled";
++        status = "okay";
+ };
+ 
+ &lpuart5 { /* UART5: Data UART */
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_uart5>;
+ 	fsl,uart-has-rtscts;
+-	status = "disabled";
++	status = "okay";
++};
++
++&media_blk_ctrl {
++       status = "okay";
+ };
+ 
+ &usbotg1 {
+ 	dr_mode = "otg";
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_usbotg1>;
++	hnp-disable;
++	srp-disable;
++	adp-disable;
+ 	disable-over-current;
+-        status = "okay";
++	samsung,picophy-pre-emp-curr-control = <3>;
++	samsung,picophy-dc-vol-level-adjust = <7>;
++	status = "okay";
++
+ };
+ 
+ &usbotg2 {
+@@ -379,7 +397,7 @@
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_lpspi1>, <&pinctrl_lpspi1_cs>;
+         cs-gpios = <&gpio1 11 GPIO_ACTIVE_LOW>;
+-	status = "disabled";
++	status = "okay";
+ 
+         spi_flash0: spi@0 { /* IS25WP016D-JNLE SPI Flash */
+                 reg = <0>;
+@@ -451,40 +469,41 @@
+ 
+ 	pinctrl_fec: fecgrp {
+ 		fsl,pins = <
+-			MX91_PAD_ENET2_MDC__ENET2_MDC				0x57e
+-			MX91_PAD_ENET2_MDIO__ENET2_MDIO				0x57e
+-			MX91_PAD_ENET2_RD0__ENET2_RGMII_RD0			0x57e
+-			MX91_PAD_ENET2_RD1__ENET2_RGMII_RD1			0x57e
+-			MX91_PAD_ENET2_RD2__ENET2_RGMII_RD2			0x57e
+-			MX91_PAD_ENET2_RD3__ENET2_RGMII_RD3			0x57e
+-			MX91_PAD_ENET2_RXC__ENET2_RGMII_RXC			0x5fe
+-			MX91_PAD_ENET2_RX_CTL__ENET2_RGMII_RX_CTL		0x57e
+-			MX91_PAD_ENET2_TD0__ENET2_RGMII_TD0			0x57e
+-			MX91_PAD_ENET2_TD1__ENET2_RGMII_TD1			0x57e
+-			MX91_PAD_ENET2_TD2__ENET2_RGMII_TD2			0x57e
+-			MX91_PAD_ENET2_TD3__ENET2_RGMII_TD3			0x57e
+-			MX91_PAD_ENET2_TXC__ENET2_RGMII_TXC			0x5fe
+-			MX91_PAD_ENET2_TX_CTL__ENET2_RGMII_TX_CTL		0x57e
+-			MX91_PAD_SD3_DATA1__GPIO3_IO23				0x31e /*ENET_Reset_GPIO*/
++			MX91_PAD_ENET2_MDC__ENET2_MDC			0x57e
++			MX91_PAD_ENET2_MDIO__ENET2_MDIO			0x57e
++			MX91_PAD_ENET2_RD0__ENET2_RGMII_RD0		0x57e
++			MX91_PAD_ENET2_RD1__ENET2_RGMII_RD1		0x57e
++			MX91_PAD_ENET2_RD2__ENET2_RGMII_RD2		0x57e
++			MX91_PAD_ENET2_RD3__ENET2_RGMII_RD3		0x57e
++			MX91_PAD_ENET2_RXC__ENET2_RGMII_RXC		0x5fe
++			MX91_PAD_ENET2_RX_CTL__ENET2_RGMII_RX_CTL	0x57e
++			MX91_PAD_ENET2_TD0__ENET2_RGMII_TD0		0x57e
++			MX91_PAD_ENET2_TD1__ENET2_RGMII_TD1		0x57e
++			MX91_PAD_ENET2_TD2__ENET2_RGMII_TD2		0x57e
++			MX91_PAD_ENET2_TD3__ENET2_RGMII_TD3		0x57e
++			MX91_PAD_ENET2_TXC__ENET2_RGMII_TXC		0x5fe
++			MX91_PAD_ENET2_TX_CTL__ENET2_RGMII_TX_CTL	0x57e
++			MX91_PAD_SD3_DATA1__GPIO3_IO23			0x31e /*ENET_Reset_GPIO*/
++			MX91_PAD_CCM_CLKO4__GPIO4_IO29                  0x57e /*ENET_INT*/
+ 		>;
+ 	};
+ 
+ 	pinctrl_fec_sleep: fecsleepgrp {
+ 		fsl,pins = <
+-			MX91_PAD_ENET2_MDC__GPIO4_IO14				0x51e
+-			MX91_PAD_ENET2_MDIO__GPIO4_IO15				0x51e
+-			MX91_PAD_ENET2_RD0__GPIO4_IO24				0x51e
+-			MX91_PAD_ENET2_RD1__GPIO4_IO25				0x51e
+-			MX91_PAD_ENET2_RD2__GPIO4_IO26				0x51e
+-			MX91_PAD_ENET2_RD3__GPIO4_IO27				0x51e
+-			MX91_PAD_ENET2_RXC__GPIO4_IO23				0x51e
+-			MX91_PAD_ENET2_RX_CTL__GPIO4_IO22			0x51e
+-			MX91_PAD_ENET2_TD0__GPIO4_IO19				0x51e
+-			MX91_PAD_ENET2_TD1__GPIO4_IO18				0x51e
+-			MX91_PAD_ENET2_TD2__GPIO4_IO17				0x51e
+-			MX91_PAD_ENET2_TD3__GPIO4_IO16				0x51e
+-			MX91_PAD_ENET2_TXC__GPIO4_IO21				0x51e
+-			MX91_PAD_ENET2_TX_CTL__GPIO4_IO20			0x51e
++			MX91_PAD_ENET2_MDC__GPIO4_IO14			0x51e
++			MX91_PAD_ENET2_MDIO__GPIO4_IO15			0x51e
++			MX91_PAD_ENET2_RD0__GPIO4_IO24			0x51e
++			MX91_PAD_ENET2_RD1__GPIO4_IO25			0x51e
++			MX91_PAD_ENET2_RD2__GPIO4_IO26			0x51e
++			MX91_PAD_ENET2_RD3__GPIO4_IO27			0x51e
++			MX91_PAD_ENET2_RXC__GPIO4_IO23			0x51e
++			MX91_PAD_ENET2_RX_CTL__GPIO4_IO22		0x51e
++			MX91_PAD_ENET2_TD0__GPIO4_IO19			0x51e
++			MX91_PAD_ENET2_TD1__GPIO4_IO18			0x51e
++			MX91_PAD_ENET2_TD2__GPIO4_IO17			0x51e
++			MX91_PAD_ENET2_TD3__GPIO4_IO16			0x51e
++			MX91_PAD_ENET2_TXC__GPIO4_IO21			0x51e
++			MX91_PAD_ENET2_TX_CTL__GPIO4_IO20		0x51e
+ 		>;
+ 	};
+ 
+@@ -534,15 +553,15 @@
+ 
+ 	pinctrl_flexcan1: flexcan1grp { /* CAN: FLEXCAN1 IOMUX Pin Configuration */
+                 fsl,pins = <
+-			MX91_PAD_PDM_CLK__CAN1_TX			0x139e
+-			MX91_PAD_PDM_BIT_STREAM0__CAN1_RX		0x139e
++			MX91_PAD_PDM_CLK__CAN1_TX		0x139e
++			MX91_PAD_PDM_BIT_STREAM0__CAN1_RX	0x139e
+                 >;
+         };
+ 
+ 	pinctrl_flexcan2: flexcan2grp { /* CAN: FLEXCAN2 IOMUX Pin Configuration */
+                 fsl,pins = <
+-                        MX91_PAD_GPIO_IO25__CAN2_TX               	0x139e
+-                        MX91_PAD_GPIO_IO27__CAN2_RX                	0x139e
++                        MX91_PAD_GPIO_IO25__CAN2_TX            	0x139e
++                        MX91_PAD_GPIO_IO27__CAN2_RX            	0x139e
+                 >;
+         };
+ 
+diff -Naur A/arch/arm64/boot/dts/freescale/imx91-iwg50m-prgjj.dts B/arch/arm64/boot/dts/freescale/imx91-iwg50m-prgjj.dts
+--- A/arch/arm64/boot/dts/freescale/imx91-iwg50m-prgjj.dts	2026-01-14 16:11:39.000000000 +0530
++++ B/arch/arm64/boot/dts/freescale/imx91-iwg50m-prgjj.dts	2026-01-16 14:16:24.795385918 +0530
+@@ -11,7 +11,7 @@
+ 
+ 	backlight: backlight {
+ 		compatible = "pwm-backlight";
+-		pwms = <&tpm5 1 40000 0>;	/* 25KHz PWM */
++		pwms = <&tpm5 1 40000 PWM_POLARITY_INVERTED>;   /* 25KHz PWM */
+ 		brightness-levels = <0 100>;
+ 		num-interpolated-steps = <100>;
+ 		default-brightness-level = <80>;
+@@ -19,6 +19,7 @@
+ 
+ 	panel {
+ 		compatible = "edt,etm0700g0dh6";
++		standby-gpios = <&gpio2 27 GPIO_ACTIVE_LOW>;    /* STBYB */
+ 		backlight = <&backlight>;
+ 
+ 		port {
+@@ -60,9 +61,7 @@
+        pinctrl-0 = <&pinctrl_tpm5_ch1>;
+         status = "okay";
+ };
+-
+ &iomuxc {
+-
+ 	pinctrl_lcdif: lcdifgrp {
+ 		fsl,pins = <
+ 			MX91_PAD_GPIO_IO00__MEDIAMIX_DISP_CLK		0x31e
+diff -Naur A/arch/arm64/boot/dts/freescale/imx91-iwg50m-prgjj-ld.dts B/arch/arm64/boot/dts/freescale/imx91-iwg50m-prgjj-ld.dts
+--- A/arch/arm64/boot/dts/freescale/imx91-iwg50m-prgjj-ld.dts	2026-01-14 16:11:39.000000000 +0530
++++ B/arch/arm64/boot/dts/freescale/imx91-iwg50m-prgjj-ld.dts	2026-01-16 15:30:55.464676924 +0530
+@@ -3,7 +3,7 @@
+  * Copyright 2025 iWave Global Pvt Ltd.
+  */
+ 
+-#include "imx91-iwg50m-prgjj-41.dts"
++#include "imx91-iwg50m-osm.dtsi"
+ 
+ 
+ &lpm {
+diff -Naur A/arch/arm64/configs/iw_rainbowg50m_defconfig B/arch/arm64/configs/iw_rainbowg50m_defconfig
+--- A/arch/arm64/configs/iw_rainbowg50m_defconfig	2026-01-14 16:11:39.000000000 +0530
++++ B/arch/arm64/configs/iw_rainbowg50m_defconfig	2026-01-16 15:24:15.192057605 +0530
+@@ -1,3 +1,4 @@
++CONFIG_SND_AUDIO_GRAPH_CARD2=y
+ CONFIG_SYSVIPC=y
+ CONFIG_POSIX_MQUEUE=y
+ CONFIG_AUDIT=y
+@@ -31,13 +32,17 @@
+ CONFIG_BLK_DEV_INITRD=y
+ CONFIG_KALLSYMS_ALL=y
+ CONFIG_PROFILING=y
++CONFIG_ARCH_KEEMBAY=y
+ CONFIG_ARCH_NXP=y
++CONFIG_ARCH_LAYERSCAPE=y
+ CONFIG_ARCH_MXC=y
++CONFIG_ARCH_S32=y
++CONFIG_IWG50M_OSM=y
++CONFIG_SOC_S32V234=y
+ CONFIG_ARM64_VA_BITS_48=y
+ CONFIG_SCHED_MC=y
+ CONFIG_SCHED_SMT=y
+ CONFIG_NUMA=y
+-CONFIG_IWG50M_OSM=y
+ CONFIG_KEXEC=y
+ CONFIG_KEXEC_FILE=y
+ CONFIG_CRASH_DUMP=y
+@@ -62,6 +67,7 @@
+ CONFIG_ARM_SCPI_CPUFREQ=y
+ CONFIG_ARM_IMX_CPUFREQ_DT=y
+ CONFIG_ARM_SCMI_CPUFREQ=y
++CONFIG_QORIQ_CPUFREQ=y
+ CONFIG_ACPI=y
+ CONFIG_ACPI_APEI=y
+ CONFIG_ACPI_APEI_GHES=y
+@@ -132,7 +138,7 @@
+ CONFIG_BRIDGE_NF_EBTABLES=m
+ CONFIG_BRIDGE=y
+ CONFIG_BRIDGE_VLAN_FILTERING=y
+-CONFIG_NET_DSA=y
++CONFIG_NET_DSA=m
+ CONFIG_VLAN_8021Q=y
+ CONFIG_VLAN_8021Q_GVRP=y
+ CONFIG_VLAN_8021Q_MVRP=y
+@@ -148,8 +154,8 @@
+ CONFIG_NET_CLS_U32=y
+ CONFIG_NET_CLS_FLOWER=y
+ CONFIG_NET_CLS_ACT=y
+-CONFIG_NET_ACT_GACT=y
+-CONFIG_NET_ACT_MIRRED=y
++CONFIG_NET_ACT_GACT=m
++CONFIG_NET_ACT_MIRRED=m
+ CONFIG_NET_ACT_SKBEDIT=y
+ CONFIG_NET_ACT_GATE=y
+ CONFIG_NET_ACT_POLICE=y
+@@ -160,7 +166,7 @@
+ CONFIG_QRTR_SMD=m
+ CONFIG_QRTR_TUN=m
+ CONFIG_NET_PKTGEN=m
+-CONFIG_CAN=y
++CONFIG_CAN=m
+ CONFIG_BT=y
+ CONFIG_BT_RFCOMM=y
+ CONFIG_BT_RFCOMM_TTY=y
+@@ -204,9 +210,11 @@
+ CONFIG_PCI_HOST_THUNDER_ECAM=y
+ CONFIG_PCI_IMX6_HOST=y
+ CONFIG_PCI_IMX6_EP=y
++CONFIG_PCI_LAYERSCAPE=y
+ CONFIG_PCI_HISI=y
+ CONFIG_PCIE_KIRIN=y
+ CONFIG_PCI_MESON=m
++CONFIG_PCIE_LAYERSCAPE_GEN4=y
+ CONFIG_PCI_ENDPOINT=y
+ CONFIG_PCI_ENDPOINT_CONFIGFS=y
+ CONFIG_PCI_EPF_TEST=y
+@@ -217,6 +225,7 @@
+ CONFIG_FW_LOADER_USER_HELPER_FALLBACK=y
+ CONFIG_BRCMSTB_GISB_ARB=y
+ CONFIG_VEXPRESS_CONFIG=y
++CONFIG_FSL_MC_UAPI_SUPPORT=y
+ CONFIG_ARM_SCMI_PROTOCOL=y
+ CONFIG_ARM_SCMI_POWER_CONTROL=y
+ CONFIG_IMX_SCMI_BBM_CONTROL=y
+@@ -256,7 +265,7 @@
+ CONFIG_BLK_DEV_NVME=y
+ CONFIG_SRAM=y
+ CONFIG_PCI_ENDPOINT_TEST=y
+-CONFIG_EEPROM_AT24=y
++CONFIG_EEPROM_AT24=m
+ CONFIG_EEPROM_AT25=m
+ CONFIG_UACCE=m
+ # CONFIG_SCSI_PROC_FS is not set
+@@ -272,6 +281,7 @@
+ CONFIG_AHCI_IMX=y
+ CONFIG_AHCI_CEVA=y
+ CONFIG_AHCI_XGENE=y
++CONFIG_AHCI_QORIQ=y
+ CONFIG_SATA_SIL24=y
+ CONFIG_PATA_OF_PLATFORM=y
+ CONFIG_MD=y
+@@ -302,10 +312,17 @@
+ CONFIG_THUNDER_NIC_PF=y
+ CONFIG_FEC=m
+ CONFIG_FEC_UIO=y
++CONFIG_FSL_FMAN=y
++CONFIG_FSL_DPAA_ETH=y
++CONFIG_FSL_DPAA2_ETH=y
++CONFIG_FSL_DPAA2_MAC=y
++CONFIG_FSL_DPAA2_SWITCH=y
+ CONFIG_FSL_ENETC=y
+ CONFIG_FSL_ENETC_VF=y
+ CONFIG_FSL_ENETC_QOS=y
+ CONFIG_FSL_ENETC4=y
++CONFIG_FSL_NETC_PRB_IERB=y
++CONFIG_FSL_NTMP=y
+ CONFIG_NXP_NETC_BLK_CTRL=y
+ CONFIG_FSL_ENETC_MDIO=y
+ CONFIG_HIX5HD2_GMAC=y
+@@ -349,7 +366,7 @@
+ CONFIG_REALTEK_PHY=y
+ CONFIG_ROCKCHIP_PHY=y
+ CONFIG_VITESSE_PHY=y
+-CONFIG_CAN_FLEXCAN=y
++CONFIG_CAN_FLEXCAN=m
+ CONFIG_MDIO_BITBANG=y
+ CONFIG_MDIO_BUS_MUX_MULTIPLEXER=y
+ CONFIG_MDIO_BUS_MUX_MMIOREG=y
+@@ -448,6 +465,7 @@
+ CONFIG_SPI_NXP_FLEXSPI=y
+ CONFIG_SPI_NXP_XSPI=y
+ CONFIG_SPI_IMX=y
++CONFIG_SPI_FSL_DSPI=y
+ CONFIG_SPI_PL022=y
+ CONFIG_SPI_ROCKCHIP=y
+ CONFIG_SPI_SPIDEV=y
+@@ -470,9 +488,12 @@
+ CONFIG_PINCTRL_IMX8DXL=y
+ CONFIG_PINCTRL_IMX8ULP=y
+ CONFIG_PINCTRL_IMX93=y
++CONFIG_PINCTRL_S32V234=y
++CONFIG_GPIO_ALTERA=m
+ CONFIG_GPIO_DWAPB=y
+ CONFIG_GPIO_IMX_RPMSG=y
+ CONFIG_GPIO_MB86S7X=y
++CONFIG_GPIO_MPC8XXX=y
+ CONFIG_GPIO_MXC=y
+ CONFIG_GPIO_PL061=y
+ CONFIG_GPIO_WCD934X=m
+@@ -485,6 +506,7 @@
+ CONFIG_GPIO_ADP5585=y
+ CONFIG_GPIO_BD9571MWV=m
+ CONFIG_GPIO_MAX77620=y
++CONFIG_GPIO_SL28CPLD=m
+ CONFIG_GPIO_SYSFS=y
+ CONFIG_POWER_RESET_BRCMSTB=y
+ CONFIG_POWER_RESET_IMX=y
+@@ -501,6 +523,7 @@
+ CONFIG_SENSORS_FP9931=y
+ CONFIG_SENSORS_LM90=m
+ CONFIG_SENSORS_PWM_FAN=m
++CONFIG_SENSORS_SL28CPLD=m
+ CONFIG_SENSORS_INA2XX=m
+ CONFIG_SENSORS_INA3221=m
+ CONFIG_SENSORS_EMC2305=m
+@@ -514,6 +537,7 @@
+ CONFIG_IMX91_THERMAL=y
+ CONFIG_QORIQ_THERMAL=y
+ CONFIG_WATCHDOG=y
++CONFIG_SL28CPLD_WATCHDOG=m
+ CONFIG_ARM_SP805_WATCHDOG=y
+ CONFIG_ARM_SBSA_WATCHDOG=y
+ CONFIG_DW_WATCHDOG=y
+@@ -537,6 +561,7 @@
+ CONFIG_MFD_MT6397=y
+ CONFIG_MFD_RK808=y
+ CONFIG_MFD_SEC_CORE=y
++CONFIG_MFD_SL28CPLD=y
+ CONFIG_MFD_ROHM_BD718XX=y
+ CONFIG_MFD_WCD934X=m
+ CONFIG_REGULATOR_FIXED_VOLTAGE=y
+@@ -590,7 +615,9 @@
+ CONFIG_V4L_PLATFORM_DRIVERS=y
+ CONFIG_SDR_PLATFORM_DRIVERS=y
+ CONFIG_V4L_MEM2MEM_DRIVERS=y
++CONFIG_VIDEO_MX8_CAPTURE=y
+ CONFIG_VIDEO_MXC_CAPTURE=y
++CONFIG_VIDEO_MXC_CSI_CAMERA=y
+ CONFIG_MXC_MIPI_CSI=y
+ CONFIG_VIDEO_IMX_MIPI_CSIS=m
+ CONFIG_VIDEO_IMX8MQ_MIPI_CSI2=m
+@@ -611,14 +638,17 @@
+ CONFIG_VIDEO_IMX219=m
+ CONFIG_VIDEO_OV5640=y
+ CONFIG_VIDEO_OV5645=m
+-CONFIG_VIDEO_AP1302=m
++CONFIG_VIDEO_AP1302=y
++CONFIG_VIDEO_AP130X=m
+ CONFIG_VIDEO_OX03C10_DRV=m
+ CONFIG_VIDEO_OX05B1S=m
+ CONFIG_VIDEO_MT9M114X=y
++CONFIG_VIDEO_MT9M114=y
+ CONFIG_VIDEO_MAX96724=m
+ CONFIG_VIDEO_MX95MBCAM=m
+ CONFIG_VIDEO_DS90UB953=m
+ CONFIG_VIDEO_DS90UB960=m
++CONFIG_VIRTIO_VIDEO=y
+ CONFIG_IMX_DPU_CORE=y
+ CONFIG_IMX8MM_LCDIF_CORE=y
+ CONFIG_IMX_LCDIFV3_CORE=y
+@@ -765,7 +795,6 @@
+ CONFIG_SND_SOC_LPASS_VA_MACRO=m
+ CONFIG_SND_SIMPLE_CARD=y
+ CONFIG_SND_AUDIO_GRAPH_CARD=y
+-CONFIG_SND_AUDIO_GRAPH_CARD2=m
+ CONFIG_SND_VIRTIO=y
+ CONFIG_HID_MULTITOUCH=m
+ CONFIG_I2C_HID_ACPI=m
+@@ -880,8 +909,8 @@
+ CONFIG_LEDS_TRIGGER_DEFAULT_ON=y
+ CONFIG_LEDS_TRIGGER_PANIC=y
+ CONFIG_EDAC=y
+-CONFIG_EDAC_LAYERSCAPE=m
+ CONFIG_EDAC_GHES=y
++CONFIG_EDAC_LAYERSCAPE=m
+ CONFIG_EDAC_SYNOPSYS=y
+ CONFIG_RTC_CLASS=y
+ CONFIG_RTC_DRV_DS1307=m
+@@ -896,8 +925,10 @@
+ CONFIG_RTC_DRV_S5M=y
+ CONFIG_RTC_DRV_DS3232=y
+ CONFIG_RTC_DRV_PCF2127=m
++CONFIG_RTC_DRV_PCF2131=m
+ CONFIG_RTC_DRV_EFI=y
+ CONFIG_RTC_DRV_CROS_EC=y
++CONFIG_RTC_DRV_FSL_FTM_ALARM=m
+ CONFIG_RTC_DRV_PL031=y
+ CONFIG_RTC_DRV_SNVS=y
+ CONFIG_RTC_DRV_BBNSM=m
+@@ -918,6 +949,7 @@
+ CONFIG_QCOM_HIDMA=y
+ CONFIG_DW_EDMA=y
+ CONFIG_DW_EDMA_PCIE=y
++CONFIG_FSL_DPAA2_QDMA=m
+ CONFIG_DMATEST=y
+ CONFIG_UDMABUF=y
+ CONFIG_DMABUF_HEAPS=y
+@@ -928,6 +960,7 @@
+ CONFIG_UIO_IVSHMEM=y
+ CONFIG_VFIO=y
+ CONFIG_VFIO_PCI=y
++CONFIG_VFIO_FSL_MC=y
+ CONFIG_VIRTIO_PCI=y
+ CONFIG_VIRTIO_BALLOON=y
+ CONFIG_VIRTIO_INPUT=y
+@@ -946,6 +979,11 @@
+ CONFIG_STAGING_MEDIA=y
+ CONFIG_VIDEO_IMX_CAPTURE=y
+ CONFIG_IMX8_MEDIA_DEVICE=m
++CONFIG_MHDP_HDMIRX=y
++CONFIG_MHDP_HDMIRX_CEC=y
++CONFIG_FSL_DPAA2=y
++CONFIG_FSL_PPFE=y
++CONFIG_FSL_PPFE_UTIL_DISABLED=y
+ CONFIG_ETHOSU=y
+ CONFIG_NEUTRON=y
+ CONFIG_CHROME_PLATFORMS=y
+@@ -958,6 +996,7 @@
+ CONFIG_COMMON_CLK_SCMI=y
+ CONFIG_COMMON_CLK_SCPI=y
+ CONFIG_COMMON_CLK_CS2000_CP=y
++CONFIG_COMMON_CLK_FSL_SAI=y
+ CONFIG_COMMON_CLK_S2MPS11=y
+ CONFIG_COMMON_CLK_XGENE=y
+ CONFIG_COMMON_CLK_PWM=y
+@@ -992,6 +1031,8 @@
+ CONFIG_SOUNDWIRE=m
+ CONFIG_SOUNDWIRE_QCOM=m
+ CONFIG_SOC_BRCMSTB=y
++CONFIG_FSL_DPAA=y
++CONFIG_FSL_MC_DPIO=y
+ CONFIG_FSL_RCPM=y
+ CONFIG_FSL_QIXIS=y
+ CONFIG_SOC_TI=y
+@@ -1015,7 +1056,7 @@
+ CONFIG_FXAS21002C=y
+ CONFIG_FXOS8700_I2C=y
+ CONFIG_RPMSG_IIO_PEDOMETER=m
+-CONFIG_IIO_ST_LSM6DSX=y
++CONFIG_IIO_ST_LSM6DSX=n
+ CONFIG_IIO_ST_ACCEL_3AXIS=m
+ CONFIG_IIO_ST_ACCEL_I2C_3AXIS=m
+ CONFIG_IIO_ST_GYRO_I2C_3AXIS=m
+@@ -1040,6 +1081,8 @@
+ CONFIG_PWM_IMX27=y
+ CONFIG_PWM_IMX_TPM=y
+ CONFIG_PWM_RPCHIP=y
++CONFIG_PWM_SL28CPLD=m
++CONFIG_SL28CPLD_INTC=y
+ CONFIG_RESET_IMX7=y
+ CONFIG_RESET_IMX8ULP_CSR=y
+ CONFIG_RESET_IMX8ULP_SIM=y
+@@ -1054,6 +1097,8 @@
+ CONFIG_PHY_FSL_IMX8M_PCIE=y
+ CONFIG_PHY_FSL_SAMSUNG_HDMI_PHY=y
+ CONFIG_PHY_FSL_IMX8QM_HSIO=y
++CONFIG_PHY_FSL_IMX8Q_PCIE=y
++CONFIG_PHY_SAMSUNG_HDMI_PHY=y
+ CONFIG_PHY_QCOM_USB_HS=y
+ CONFIG_PHY_SAMSUNG_USB2=y
+ CONFIG_ARM_CCI_PMU=m
+@@ -1167,6 +1212,7 @@
+ CONFIG_CRYPTO_DEV_FSL_CAAM_SECVIO=m
+ CONFIG_CRYPTO_DEV_FSL_CAAM=m
+ CONFIG_CRYPTO_DEV_FSL_CAAM_SM_TEST=m
++CONFIG_CRYPTO_DEV_FSL_DPAA2_CAAM=m
+ CONFIG_CRYPTO_DEV_CCREE=m
+ CONFIG_CRYPTO_DEV_HISI_SEC2=m
+ CONFIG_CRYPTO_DEV_HISI_ZIP=m
+@@ -1201,3 +1247,5 @@
+ CONFIG_VHOST_NET=m
+ CONFIG_VIDEO_MAX9286=y
+ CONFIG_VIDEO_RDACM20=y
++CONFIG_IMX_ISPMU=m
++CONFIG_IMX_ISP_REMOTEPROC=m

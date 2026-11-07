@@ -1,0 +1,71 @@
+{
+  "schema": "iwave.linux-source.v1",
+  "origin": "iWave vendor Linux BSP for Telematics Connect Hub",
+  "repository": "linux-imx9-iwave",
+  "revision": "02cf250c2e6bd375c11dae324ea145a39015d41b",
+  "vendor_archive_sha256": "a1ccde9b961bfbfe1a7e4efa8da75eab6342d7b8b0723e9dd28d6032a5893d43",
+  "patches": [
+    {
+      "file": "PATCH000.patch",
+      "sha256": "4f4256a2d17249f00ae698931a01fe842915dfe5cbdb9a4e8039fd094881ef48"
+    },
+    {
+      "file": "PATCH001.patch",
+      "sha256": "f2af9b857cde1c71cb7debaf33b764482b5af299c5d989862d873e90f3202a40"
+    },
+    {
+      "file": "PATCH002-iW-PRGTT-R2.0-REL2.1-Linux6.6.52-Acc_gyro.patch",
+      "sha256": "518a3ac69c7f4d473c06db84edbf4af1765d0019496ae642034fb399e92a5a28"
+    },
+    {
+      "file": "PATCH003.patch",
+      "sha256": "6428d3cd408776b3a4376ec7a56e717723899077c1e2988e0405f934f1284797"
+    },
+    {
+      "file": "PATCH004-iW-PRGTT-R2.0-REL2.2-Linux6.6.52-BLE_update.patch",
+      "sha256": "feb1141f9439e05a8caedeb9e758fbb0e78db4d6b792eb9a8a0fd5a58d9066d4"
+    },
+    {
+      "file": "PATCH005-iW-PRGTT-R2.0-REL2.3-Linux6.6.52_BR_mode_upadte.patch",
+      "sha256": "9687c74cc636acd159059502eb255caa133819d0364458a37ffb728712d0c531"
+    },
+    {
+      "file": "PATCH006-iW-PRGTT-R2.0-REL2.4-Linux6.6.52-BLE_CTS_RTS_as_GPIO.patch",
+      "sha256": "02f5a92b21426145a16122a10ebdc7f72272b714c96afe8ece0afb963fbc0d5a"
+    },
+    {
+      "file": "PATCH007.patch",
+      "sha256": "c3dc57b28a382227d9fab4f9b6bf98e689be2c90727e85f5bfaa1f6b2aa4a711"
+    },
+    {
+      "file": "PATCH008_A1_CPU_GPIOS_Modified.patch",
+      "sha256": "f3384ae0032f34bd4563953e7e7a2adfa88b87977ecfc15d09f59d68dbfe669e"
+    },
+    {
+      "file": "PATCH009_Kernel_BSP_Version_Update.patch",
+      "sha256": "f17fc5b96eedd26cac39ca3c8cde1f41041b30f0ba2640e49d4e90b6a52f7058"
+    },
+    {
+      "file": "PATCH0010-iG-PRGTT-SC-01-R2.0-REL3.0-Linux6.12.34_Battery_Current_Limit.patch",
+      "sha256": "6ede9cad00c5e2cb773bc0ac4b68cdc371c2e2b9821c963afa60e65f13a978dc"
+    },
+    {
+      "file": "PATCH0011-iG-PRGTT-SC-01-R2.0-REL3.1-Linux6.12.34_Battery_Shipment_Mode_Disable.patch",
+      "sha256": "723c916c0c213b2732691af566a9c43d4329a579adc3444e0fb1bfe21b5b3fb0"
+    },
+    {
+      "file": "PATCH0012-Quectel_USB_Serial_Driver_Code.patch",
+      "sha256": "0d4aeb7301e942acafe208815380e5ab646033e188d2496d5f369cd5fbf867c3"
+    },
+    {
+      "file": "PATCH0013-iG-PRGTT-SC-01-R2.0-REL3.2-Linux6.12.34-Kernel_BSP_Version_Update.patch",
+      "sha256": "ac243968efbc4cbe528786aa314c11751fff649a8881e908bb07fa9607d27053"
+    },
+    {
+      "file": "PATCH0014-iG-PRGTT-SC-01-R2.0-REL3.3-Linux6.12.34-Kernel_BSP_Version_Update.patch",
+      "sha256": "75af3ba81717dee242e5a3f0184939a05a6da20dcdaea86277befcfeeb1e7008"
+    }
+  ],
+  "public_base_source_download": "https://github.com/marcinborecki/OMAM_iwave-linux-extensions/releases/download/v0.1.0-source-only/kernel-core-6.12.34-tch-rel33.tar.zst",
+  "corresponding_source_status": "Kernel core available locally; pinned public candidate sources identified for five factory modules, exact binary correspondence unverified"
+}

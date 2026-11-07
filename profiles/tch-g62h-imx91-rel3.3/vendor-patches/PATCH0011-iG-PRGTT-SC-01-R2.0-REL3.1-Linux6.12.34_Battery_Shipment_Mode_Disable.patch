@@ -1,0 +1,22 @@
+Upstream-Status: Inappropriate [iwave-specific]
+
+diff -Naur A/drivers/power/supply/bq256xx_charger.c B/drivers/power/supply/bq256xx_charger.c
+--- A/drivers/power/supply/bq256xx_charger.c	2026-04-22 15:29:51.571094533 +0530
++++ B/drivers/power/supply/bq256xx_charger.c	2026-04-22 15:38:40.270129109 +0530
+@@ -1781,6 +1781,16 @@
+ 			dev_info(dev, "Charge current register = 0x%x\n", val);
+ 	}
+ 
++
++	int rc;
++	/* Write default value */
++	rc = regmap_write(bq->regmap, 0x07, 0x4C);   // <-- CHANGE if needed
++	if (rc)
++		dev_err(dev, "Failed to reset reg 0x07\n");
++	else
++		dev_info(dev, "Reg 0x07 reset to 0x4C\n");
++
++
+ 	return 0;   // <-- IMPORTANT
+ }
+ 

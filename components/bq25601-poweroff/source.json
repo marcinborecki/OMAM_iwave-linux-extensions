@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "upstreamRevision": "02cf250c2e6bd375c11dae324ea145a39015d41b",
+  "base": "REL3.3 vendor recipe, all 15 patches in order",
+  "path": "drivers/power/supply/bq256xx_charger.c",
+  "preSha256": "9f4296bc70c8f84cf3f3255ac922534018baa0f73eefef1ee6000c7d2c0f1981",
+  "postSha256": "ae430d36b0f9670ba18012754936eacd95b84e16f087b0708325647cef292312",
+  "patchSha256": "3f5066476652b8697ea36cf8b76feebc7a996e417b4ebd26f6ce47a9e72e74d8",
+  "datasheet": "https://www.ti.com/lit/ds/symlink/bq25601.pdf",
+  "datasheetRevision": "SLUSCK5A, March 2023",
+  "nativeTests": "native_test.py",
+  "hardwareValidation": "not-run; instrumented road trial remains required for physical effect"
+}

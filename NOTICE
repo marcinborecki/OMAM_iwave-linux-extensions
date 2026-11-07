@@ -1,0 +1,26 @@
+iWave Linux extensions
+
+Maintained by Marcin Borecki. This is an independent project, not an official
+iWave or NXP firmware distribution. Product and vendor names identify hardware
+and source provenance, not sponsorship.
+
+The first profile targets the iWave Telematics Connect Hub G62H with NXP i.MX91,
+TCH REL3.3, and the vendor kernel revision
+02cf250c2e6bd375c11dae324ea145a39015d41b. It applies the complete ordered vendor
+patch set and the documented FlexCAN, BQ25601 and ST LSM6DSx changes.
+
+Original Linux, NXP, iWave, Freescale, STMicroelectronics, Bosch, Pengutronix and
+other contributor notices in source files and patches must remain intact. This
+repository does not claim ownership of their work. Per-file license terms and
+the Linux syscall exception remain applicable.
+
+The public source tree contains no OMAM application, SIM/APN settings, device
+credentials, service authority or private deployment profile. Kernel identifiers
+such as omam_flexcan are stable interfaces and are preserved for compatibility.
+
+A local base-image candidate is not a redistribution clearance. The five retained
+external modules still need complete matching-source evidence, and vendor
+proprietary libraries/firmware need their applicable redistribution terms. Until
+those are resolved, generated firmware archives remain local and are not attached
+to public releases. The GPL source project and its native tests can be reviewed
+independently of those binary inputs.

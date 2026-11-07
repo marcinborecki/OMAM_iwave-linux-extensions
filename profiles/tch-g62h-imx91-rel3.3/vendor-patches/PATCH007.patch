@@ -1,0 +1,111 @@
+Upstream-Status: Inappropriate [iwave-specific]
+
+diff -Naur A/arch/arm64/boot/dts/freescale/imx91-iwg50m-prgjj.dts B/arch/arm64/boot/dts/freescale/imx91-iwg50m-prgjj.dts
+--- A/arch/arm64/boot/dts/freescale/imx91-iwg50m-prgjj.dts	2026-01-28 16:29:11.885500156 +0530
++++ B/arch/arm64/boot/dts/freescale/imx91-iwg50m-prgjj.dts	1970-01-01 05:30:00.000000000 +0530
+@@ -1,105 +0,0 @@
+-// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+-/*
+- * Copyright 2025 iWave Global Pvt Ltd.
+- */
+-
+-/dts-v1/;
+-#include <dt-bindings/pwm/pwm.h>
+-#include "imx91-iwg50m-osm.dtsi"
+-
+-/ {
+-
+-	backlight: backlight {
+-		compatible = "pwm-backlight";
+-		pwms = <&tpm5 1 40000 PWM_POLARITY_INVERTED>;   /* 25KHz PWM */
+-		brightness-levels = <0 100>;
+-		num-interpolated-steps = <100>;
+-		default-brightness-level = <80>;
+-	};
+-
+-	panel {
+-		compatible = "edt,etm0700g0dh6";
+-		standby-gpios = <&gpio2 27 GPIO_ACTIVE_LOW>;    /* STBYB */
+-		backlight = <&backlight>;
+-
+-		port {
+-			panel_in: endpoint {
+-				remote-endpoint = <&display_out>;
+-			};
+-		};
+-	};
+-};
+-
+-&lcdif {
+-        status = "okay";
+-	assigned-clock-rates = <133040000>, <33260000>, <400000000>, <133333333>;
+-};
+-
+-&parallel_disp_fmt {
+-        pinctrl-names = "default";
+-        pinctrl-0 = <&pinctrl_lcdif>;
+-	fsl,interface-pix-fmt = "rgb666";
+-        status = "okay";
+-
+-        ports {
+-                port@1 {
+-                        reg = <1>;
+-
+-                        display_out: endpoint {
+-                                remote-endpoint = <&panel_in>;
+-                        };
+-                };
+-        };
+-};
+-
+-&media_blk_ctrl {
+-	status = "okay";
+-};
+-
+-&tpm5 {
+-        pinctrl-names = "default";
+-       pinctrl-0 = <&pinctrl_tpm5_ch1>;
+-        status = "okay";
+-};
+-&iomuxc {
+-	pinctrl_lcdif: lcdifgrp {
+-		fsl,pins = <
+-			MX91_PAD_GPIO_IO00__MEDIAMIX_DISP_CLK		0x31e
+-			MX91_PAD_GPIO_IO01__MEDIAMIX_DISP_DE		0x31e
+-			MX91_PAD_GPIO_IO02__MEDIAMIX_DISP_VSYNC		0x31e
+-			MX91_PAD_GPIO_IO03__MEDIAMIX_DISP_HSYNC		0x31e
+-			MX91_PAD_GPIO_IO04__MEDIAMIX_DISP_DATA0		0x31e
+-			MX91_PAD_GPIO_IO05__MEDIAMIX_DISP_DATA1		0x31e
+-			MX91_PAD_GPIO_IO06__MEDIAMIX_DISP_DATA2		0x31e
+-			MX91_PAD_GPIO_IO07__MEDIAMIX_DISP_DATA3		0x31e
+-			MX91_PAD_GPIO_IO08__MEDIAMIX_DISP_DATA4		0x31e
+-			MX91_PAD_GPIO_IO09__MEDIAMIX_DISP_DATA5		0x31e
+-			MX91_PAD_GPIO_IO10__MEDIAMIX_DISP_DATA6		0x31e
+-			MX91_PAD_GPIO_IO11__MEDIAMIX_DISP_DATA7		0x31e
+-			MX91_PAD_GPIO_IO12__MEDIAMIX_DISP_DATA8		0x31e
+-			MX91_PAD_GPIO_IO13__MEDIAMIX_DISP_DATA9		0x31e
+-			MX91_PAD_GPIO_IO14__MEDIAMIX_DISP_DATA10	0x31e
+-			MX91_PAD_GPIO_IO15__MEDIAMIX_DISP_DATA11	0x31e
+-			MX91_PAD_GPIO_IO16__MEDIAMIX_DISP_DATA12	0x31e
+-			MX91_PAD_GPIO_IO17__MEDIAMIX_DISP_DATA13	0x31e
+-			MX91_PAD_GPIO_IO18__MEDIAMIX_DISP_DATA14	0x31e
+-			MX91_PAD_GPIO_IO19__MEDIAMIX_DISP_DATA15	0x31e
+-			MX91_PAD_GPIO_IO20__MEDIAMIX_DISP_DATA16	0x31e
+-			MX91_PAD_GPIO_IO21__MEDIAMIX_DISP_DATA17	0x31e
+-			MX91_PAD_GPIO_IO23__GPIO2_IO23			0x31e
+-			MX91_PAD_GPIO_IO24__GPIO2_IO24			0x31e
+-			MX91_PAD_GPIO_IO26__GPIO2_IO26			0x31e
+-			MX91_PAD_GPIO_IO29__GPIO2_IO29			0x31e
+-			
+-		>;
+-	};
+-
+-
+-
+-	pinctrl_tpm5_ch1: tpm5ch1grp {
+-		fsl,pins = <
+-			MX91_PAD_GPIO_IO22__TPM5_CH1	0x31e
+-		>;
+-	};
+-};
+-

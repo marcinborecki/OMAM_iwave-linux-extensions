@@ -1,0 +1,42 @@
+Upstream-Status: Inappropriate [iwave-specific]
+
+diff -Naur A/drivers/power/supply/bq256xx_charger.c B/drivers/power/supply/bq256xx_charger.c
+--- A/drivers/power/supply/bq256xx_charger.c	2026-04-20 18:21:03.473200336 +0530
++++ B/drivers/power/supply/bq256xx_charger.c	2026-04-20 18:26:28.273049872 +0530
+@@ -1765,7 +1765,23 @@
+ 		return ret;
+ 	}
+ 
+-	return ret;
++	/* The below changes will reduce the Battery Charging Current to 300mA */
++	ret = regmap_write(bq->regmap, BQ256XX_CHARGE_CURRENT_LIMIT, 0x85);
++	if (ret)
++		dev_err(dev, "Failed to set charge current\n");
++
++	ret = regmap_write(bq->regmap, BQ256XX_PRECHG_AND_TERM_CURR_LIM, 0x11);
++	if (ret)
++		dev_err(dev, "Failed to set precharge current\n");
++
++	/* Debug readback */
++	{
++		unsigned int val;
++		if (!regmap_read(bq->regmap, BQ256XX_CHARGE_CURRENT_LIMIT, &val))
++			dev_info(dev, "Charge current register = 0x%x\n", val);
++	}
++
++	return 0;   // <-- IMPORTANT
+ }
+ 
+ static const struct i2c_device_id bq256xx_i2c_ids[] = {
+diff -Naur A/drivers/soc/imx/soc-imx9.c B/drivers/soc/imx/soc-imx9.c
+--- A/drivers/soc/imx/soc-imx9.c	2026-04-20 18:21:10.329285821 +0530
++++ B/drivers/soc/imx/soc-imx9.c	2026-04-20 18:22:53.006541183 +0530
+@@ -59,7 +59,7 @@
+        pr_info ("\n");
+         pr_info ("Board Info:\n");
+ 
+-        pr_info ("\tBSP Version            : iG-PRGTT-SC-01-R2.0-REL3.0-Linux6.12.34\n");
++        pr_info ("\tBSP Version            : iG-PRGTT-SC-01-R2.0-REL3.1-Linux6.12.34\n");
+         pr_info ("\tSOM Version            : iW-PRISZ-AP-01-R%d.%d\n", pcb_rev, bom_rev);
+        pr_info ("\tCPU Unique ID          : 0x%016llX%016llX\n", uid127_64, uid63_0);
+         pr_info ("\n");

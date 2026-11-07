@@ -1,0 +1,124 @@
+{
+  "schema": "iwave.source-gaps.v1",
+  "kernel_release": "6.12.34-omam-rel33-policy1",
+  "external_modules": [
+    {
+      "module": "cryptodev.ko",
+      "sha256": "0041b731cfaff262bb20dded6d839d04f796c45e259e0d7d0c4d8f7361101c09",
+      "source_status": "public candidate source and pinned recipe identified; correspondence to factory binary not verified",
+      "binary_distribution": "not included in public Git or source-only release",
+      "candidate_source": "cryptodev",
+      "package_oe": "cryptodev-module",
+      "package_version": "1.14-r0"
+    },
+    {
+      "module": "igb_uio.ko",
+      "sha256": "2e51d07348d7aa5b79ca519b6f83137fe782990bd5ccf2ee4926822408457dfa",
+      "source_status": "public candidate source and pinned recipe identified; correspondence to factory binary not verified",
+      "binary_distribution": "not included in public Git or source-only release",
+      "candidate_source": "dpdk-extras",
+      "package_oe": "kernel-module-dpdk-extras",
+      "package_version": "git-r0"
+    },
+    {
+      "module": "kpage_ncache.ko",
+      "sha256": "a34a0b8ecc864077e1a10fd40ae5dc1fc462ceb141f6f5a62979911a8bab6fda",
+      "source_status": "public candidate source and pinned recipe identified; correspondence to factory binary not verified",
+      "binary_distribution": "not included in public Git or source-only release",
+      "candidate_source": "dpdk-extras",
+      "package_oe": "kernel-module-dpdk-extras",
+      "package_version": "git-r0"
+    },
+    {
+      "module": "mlan.ko",
+      "sha256": "134d3bc084bb5cab675fd7e1abed8536ac421e164f2952cbad28ceadd33a66fc",
+      "source_status": "public candidate source and pinned recipe identified; correspondence to factory binary not verified",
+      "binary_distribution": "not included in public Git or source-only release",
+      "candidate_source": "nxp-wlan",
+      "package_oe": "kernel-module-nxp-wlan",
+      "package_version": "git-r0",
+      "module_version": "540.p7",
+      "module_srcversion": "0C4C1DDD98BA0614E8EFEAD"
+    },
+    {
+      "module": "moal.ko",
+      "sha256": "053ac7490b0d5d0f52479256be200c94568b5eb08886ad54d24b33c3731bd7a0",
+      "source_status": "public candidate source and pinned recipe identified; correspondence to factory binary not verified",
+      "binary_distribution": "not included in public Git or source-only release",
+      "candidate_source": "nxp-wlan",
+      "package_oe": "kernel-module-nxp-wlan",
+      "package_version": "git-r0",
+      "module_version": "540.p7",
+      "module_srcversion": "3F3831B352F67ECFA142402"
+    }
+  ],
+  "vendor_runtime_terms": {
+    "library": "libTelematics.so",
+    "headers": "vendor API headers",
+    "redistribution": "unconfirmed; no vendor binary is in public Git",
+    "inspected_library_variants": [
+      {
+        "location": "stock rootfs usr/lib/libTelematics.so",
+        "bytes": 397504
+      },
+      {
+        "location": "separately supplied TelematicsLibrary/libTelematics.so",
+        "bytes": 1187720,
+        "sha256": "57c950f2e7163cd3ed48e816f3a2b84d098603f41568bcd65fa7ae8d2d01ed61"
+      }
+    ],
+    "inspection_scope": "Inspected supplied API headers and bounded named rootfs package/license metadata. No public redistribution grant or matching Telematics package/license was found in that scope. Absence in this inspection does not establish the complete contractual terms."
+  },
+  "firmware_release": "blocked until source and rights gates close",
+  "candidate_source_evidence": {
+    "status": "candidate only; not accepted as verified corresponding source",
+    "rootfs_sha256": "4812a431aa677c6cdafe47a1e429902ecd15b8200ab47dd05bf4d23334c16d98",
+    "package_metadata_member": "var/lib/dpkg/status",
+    "package_arch": "imx91-iwg50m-osm",
+    "stock_kernel_release": "6.12.34-lts-next-gb1aec8c1dd0d",
+    "vendor_manifest": {
+      "repository": "iwave-imx9-manifest",
+      "revision": "7d532c15bf850b29621e9feca9df67704dc5ba88",
+      "file": "iwg50m_osms_6.12.34_2.2.0_1.0.xml",
+      "poky_revision": "b642d6a4a93a23d5b99886844ff7b224aa7e13bf",
+      "meta_freescale_revision": "167ff4ddb79299cf5477e94620a9e598659c407b",
+      "meta_imx_tag": "rel_imx_6.12.34_2.1.0",
+      "meta_iwave_revision": "de7f19bdecbb257f20551aec3a0c6d16575253fe"
+    },
+    "remaining_gap": "Confirm actual vendor build inputs, local patches, generated/staged inputs and configuration against the five recorded factory module hashes. Package names, versions, SPDX and loader compatibility alone do not establish correspondence."
+  },
+  "candidate_sources": {
+    "cryptodev": {
+      "recipe": "cryptodev-module",
+      "package_version": "1.14-r0",
+      "repository": "https://github.com/cryptodev-linux/cryptodev-linux",
+      "revision": "135cbff90af2ba97d88f1472be595ce78721972c",
+      "branch": "master",
+      "license_declared_by_recipe": "GPL-2.0-only",
+      "recipe_url": "https://github.com/yoctoproject/poky/blob/b642d6a4a93a23d5b99886844ff7b224aa7e13bf/meta/recipes-kernel/cryptodev/cryptodev-module_1.14.bb",
+      "source_pin_url": "https://github.com/yoctoproject/poky/blob/b642d6a4a93a23d5b99886844ff7b224aa7e13bf/meta/recipes-kernel/cryptodev/cryptodev.inc",
+      "qualification_note": "The NXP RSA bbappend is named cryptodev-linux_1.14.bbappend, not cryptodev-module_1.14.bbappend. Do not assume it patches cryptodev.ko; verify the actual module and staged-header inputs."
+    },
+    "dpdk-extras": {
+      "recipe": "kernel-module-dpdk-extras",
+      "package_version": "git-r0",
+      "repository": "https://github.com/nxp-qoriq/dpdk-extras",
+      "revision": "e9e32e999c3c0d6b3edead9ad51746e900572f75",
+      "branch": "main",
+      "license_declared_by_recipe": "GPL-2.0-only",
+      "recipe_url": "https://github.com/nxp-imx/meta-imx/blob/rel_imx_6.12.34_2.1.0/meta-imx-bsp/recipes-kernel/kernel-modules/kernel-module-dpdk-extras_git.bb",
+      "qualification_note": "kpage_ncache.c declares SPDX GPL-2.0, although its MODULE_LICENSE reports Dual BSD/GPL. Preserve the file license and notices."
+    },
+    "nxp-wlan": {
+      "recipe": "kernel-module-nxp-wlan",
+      "package_version": "git-r0",
+      "repository": "https://github.com/nxp-imx/mwifiex",
+      "revision": "1e1f69bf38369807443e8f567cac63e26fe80881",
+      "branch": "lf-6.12.34_2.1.0",
+      "license_declared_by_recipe": "GPL-2.0-only",
+      "recipe_url": "https://github.com/Freescale/meta-freescale/blob/167ff4ddb79299cf5477e94620a9e598659c407b/recipes-kernel/kernel-modules/kernel-module-nxp-wlan_git.bb",
+      "source_pin_url": "https://github.com/nxp-imx/meta-imx/blob/rel_imx_6.12.34_2.1.0/meta-imx-bsp/recipes-kernel/kernel-modules/kernel-module-nxp-wlan_git.bbappend",
+      "qualification_note": "The NXP bbappend replaces the base recipe SRC_URI, branch and revision. Candidate Makefile declares 540.p7, matching the binaries; version equality does not verify corresponding source."
+    }
+  }
+}

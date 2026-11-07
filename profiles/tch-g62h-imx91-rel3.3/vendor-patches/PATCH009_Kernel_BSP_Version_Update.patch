@@ -1,0 +1,14 @@
+Upstream-Status: Inappropriate [iwave-specific]
+
+diff -Naur A/drivers/soc/imx/soc-imx9.c B/drivers/soc/imx/soc-imx9.c
+--- A/drivers/soc/imx/soc-imx9.c	2026-03-13 16:04:18.835988714 +0530
++++ B/drivers/soc/imx/soc-imx9.c	2026-03-13 16:12:15.903316685 +0530
+@@ -59,7 +59,7 @@
+        pr_info ("\n");
+         pr_info ("Board Info:\n");
+ 
+-        pr_info ("\tBSP Version            : iW-PRISZ-SC-01-R1.0-REL1.0a-Linux6.12.34\n");
++        pr_info ("\tBSP Version            : iG-PRGTT-SC-01-R2.0-REL3.0-Linux6.12.34\n");
+         pr_info ("\tSOM Version            : iW-PRISZ-AP-01-R%d.%d\n", pcb_rev, bom_rev);
+        pr_info ("\tCPU Unique ID          : 0x%016llX%016llX\n", uid127_64, uid63_0);
+         pr_info ("\n");

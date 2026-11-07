@@ -1,0 +1,70 @@
+Upstream-Status: Inappropriate [iwave-specific]
+
+diff -Naur A/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts B/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts
+--- A/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts	2025-03-21 09:20:34.242023210 +0530
++++ B/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts	2025-04-01 10:43:11.677245306 +0530
+@@ -21,7 +21,22 @@
+                         wakeup-source;
+                         linux,code = <29>;
+                 };
+-        }; 
++        };
++	gpio-keys1 {
++                compatible = "gpio-keys";
++                pinctrl-names = "default";
++                pinctrl-0 = <&pinctrl_gpio_keys1>;
++
++                ble-wakeup {
++                        label = "wakeup-gpio";
++                        gpios = <&gpio3 27 0>;
++                        keep-power-in-suspend;
++                        gpio-key,wakeup;
++                        wakeup-source;
++                        linux,code = <29>;
++                };
++	};
++ 
+ };
+ &iomuxc {
+ 
+@@ -35,6 +50,13 @@
+                 >;
+         };
+ 	
++	 pinctrl_gpio_keys1: gpio_keysgrp1 {
++                 fsl,pins = <
++			MX91_PAD_CCM_CLKO2__GPIO3_IO27           0x51d    
++                        >;
++                };
++
++	
+ 	pinctrl_expansion: expansion_pinsgrp {
+                 fsl,pins = <
+                         MX91_PAD_SAI1_TXC__GPIO1_IO12                   0x51d
+@@ -43,7 +65,7 @@
+                         MX91_PAD_GPIO_IO19__GPIO2_IO19                  0x518 /*cellular switch */
+                         MX91_PAD_ENET1_RD0__GPIO4_IO10                  0x51d /*Assm conf bit 4 */
+                         MX91_PAD_ENET2_RD2__GPIO4_IO26                  0x57d /*cellular USB boot */
+-                        /*MX91_PAD_GPIO_IO20__GPIO2_IO20                  0x518*/ /* BR mode enable */
++                        MX91_PAD_GPIO_IO20__GPIO2_IO20                  0x518 /* BR mode enable */
+                         MX91_PAD_GPIO_IO10__GPIO2_IO10                  0x518 /* STATUS LED */
+                         MX91_PAD_GPIO_IO11__GPIO2_IO11                  0x518  /*WIR*/ 
+                         MX91_PAD_GPIO_IO04__GPIO2_IO4                   0x318  /*secure ele */
+@@ -53,7 +75,7 @@
+                         MX91_PAD_GPIO_IO00__GPIO2_IO0                   0x518  /*BAT charger CE pin*/
+                         MX91_PAD_SD3_CMD__GPIO3_IO21                    0x51d  /*Load dump */
+                         MX91_PAD_CCM_CLKO4__GPIO4_IO29                  0x57d /*cellular mod emergency off */
+-                        MX91_PAD_SD3_DATA1__GPIO3_IO23                  0x51d /*BLE reset */
++                        MX91_PAD_SD3_DATA1__GPIO3_IO23                  0x31d /*BLE reset */
+                         MX91_PAD_SD3_DATA2__GPIO3_IO24                  0x51d /*Load dump */
+                         MX91_PAD_SD2_CMD__GPIO3_IO2                     0x51d /*cellular status */
+                         MX91_PAD_SD2_CLK__GPIO3_IO1                     0x51d /*Bat charger PG pin */
+@@ -62,7 +84,7 @@
+                         MX91_PAD_ENET1_TD1__GPIO4_IO4                   0x51d /*cellular  main DCD */
+                         MX91_PAD_ENET1_TD3__GPIO4_IO3                   0x51d /*cellular reset */
+                         MX91_PAD_ENET1_TX_CTL__GPIO4_IO6                0x51d /*BLE host wake up */
+-                        MX91_PAD_ENET1_TXC__GPIO4_IO7                   0x51d /*BLE reset */
++                        MX91_PAD_ENET1_TXC__GPIO4_IO7                   0x31d /*BLE reset */
+                         MX91_PAD_ENET1_RD1__GPIO4_IO11                  0x51d /*Assm conf bit 5 */      
+                         MX91_PAD_ENET1_RD2__GPIO4_IO12                  0x51d /* BLE FOTA pin 1 */
+                         MX91_PAD_ENET1_RD3__GPIO4_IO13                  0x51d /* BLE FOTA pin 2 */

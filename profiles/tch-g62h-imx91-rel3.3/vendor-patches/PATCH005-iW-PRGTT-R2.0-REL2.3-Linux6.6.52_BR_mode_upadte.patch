@@ -1,0 +1,14 @@
+Upstream-Status: Inappropriate [iwave-specific]
+
+diff -Naur A/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts B/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts
+--- A/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts	2025-06-16 10:01:34.117446673 +0530
++++ B/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts	2025-06-16 10:01:20.233399879 +0530
+@@ -65,7 +65,7 @@
+                         MX91_PAD_GPIO_IO19__GPIO2_IO19                  0x518 /*cellular switch */
+                         MX91_PAD_ENET1_RD0__GPIO4_IO10                  0x51d /*Assm conf bit 4 */
+                         MX91_PAD_ENET2_RD2__GPIO4_IO26                  0x57d /*cellular USB boot */
+-                        MX91_PAD_GPIO_IO20__GPIO2_IO20                  0x518 /* BR mode enable */
++                        MX91_PAD_GPIO_IO20__GPIO2_IO20                  0x318 /* BR mode enable */
+                         MX91_PAD_GPIO_IO10__GPIO2_IO10                  0x518 /* STATUS LED */
+                         MX91_PAD_GPIO_IO11__GPIO2_IO11                  0x518  /*WIR*/ 
+                         MX91_PAD_GPIO_IO04__GPIO2_IO4                   0x318  /*secure ele */

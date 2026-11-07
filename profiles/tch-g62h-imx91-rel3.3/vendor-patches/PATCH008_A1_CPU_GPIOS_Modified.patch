@@ -1,0 +1,53 @@
+Upstream-Status: Inappropriate [iwave-specific]
+
+diff -Naur A/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts B/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts
+--- A/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts	2026-03-04 15:52:55.260315730 +0530
++++ B/arch/arm64/boot/dts/freescale/imx91-iwg62h-prgtt.dts	2026-03-04 16:36:37.219044827 +0530
+@@ -63,7 +63,7 @@
+                         MX91_PAD_CCM_CLKO3__GPIO4_IO28                  0x51d /*cellular PWR KEY */
+                         MX91_PAD_GPIO_IO18__GPIO2_IO18                  0x518 /*DOUT2 */
+                         MX91_PAD_GPIO_IO19__GPIO2_IO19                  0x518 /*cellular switch */
+-                        MX91_PAD_ENET1_RD0__GPIO4_IO10                  0x51d /*Assm conf bit 4 */
++                        MX91_PAD_ENET1_RD0__GPIO4_IO10                  0x11d /*Assm conf bit 4 */
+                         MX91_PAD_ENET2_RD2__GPIO4_IO26                  0x57d /*cellular USB boot */
+                         MX91_PAD_GPIO_IO20__GPIO2_IO20                  0x318 /* BR mode enable */
+                         MX91_PAD_GPIO_IO10__GPIO2_IO10                  0x518 /* STATUS LED */
+@@ -77,21 +77,21 @@
+                         MX91_PAD_CCM_CLKO4__GPIO4_IO29                  0x57d /*cellular mod emergency off */
+                         MX91_PAD_SD3_DATA1__GPIO3_IO23                  0x31d /*BLE reset */
+                         MX91_PAD_SD3_DATA2__GPIO3_IO24                  0x51d /*Load dump */
+-                        MX91_PAD_SD2_CMD__GPIO3_IO2                     0x51d /*cellular status */
+-                        MX91_PAD_SD2_CLK__GPIO3_IO1                     0x51d /*Bat charger PG pin */
+-                        MX91_PAD_SD2_DATA3__GPIO3_IO6                   0x51d /*Bat charger status */   
++                        MX91_PAD_SD2_CMD__GPIO3_IO2                     0x11d /*cellular status */
++                        MX91_PAD_SD2_CLK__GPIO3_IO1                     0x31d /*Bat charger PG pin */
++                        MX91_PAD_SD2_DATA3__GPIO3_IO6                   0x31d /*Bat charger status */   
+                         MX91_PAD_ENET1_TD0__GPIO4_IO5                   0x51d /*cellular main DTR */ 
+                         MX91_PAD_ENET1_TD1__GPIO4_IO4                   0x51d /*cellular  main DCD */
+                         MX91_PAD_ENET1_TD3__GPIO4_IO2                   0x51d /*cellular reset */
+                         MX91_PAD_ENET1_TX_CTL__GPIO4_IO6                0x51d /*BLE host wake up */
+                         MX91_PAD_ENET1_TXC__GPIO4_IO7                   0x31d /*BLE reset */
+-                        MX91_PAD_ENET1_RD1__GPIO4_IO11                  0x51d /*Assm conf bit 5 */      
++                        MX91_PAD_ENET1_RD1__GPIO4_IO11                  0x11d /*Assm conf bit 5 */      
+                         MX91_PAD_ENET1_RD2__GPIO4_IO12                  0x51d /* BLE FOTA pin 1 */
+                         MX91_PAD_ENET1_RD3__GPIO4_IO13                  0x51d /* BLE FOTA pin 2 */
+-                        MX91_PAD_ENET1_RX_CTL__GPIO4_IO8                0x51d /*Assm conf bit 3 */
+-                        MX91_PAD_ENET1_RXC__GPIO4_IO9                   0x51d /*Assm conf bit 2 */
+-                        MX91_PAD_ENET1_MDIO__GPIO4_IO1                  0x51d /*Assm conf bit 1 */
+-                        MX91_PAD_ENET1_MDC__GPIO4_IO0                   0x51d /*Assm conf bit 0 */
++                        MX91_PAD_ENET1_RX_CTL__GPIO4_IO8                0x11d /*Assm conf bit 3 */
++                        MX91_PAD_ENET1_RXC__GPIO4_IO9                   0x11d /*Assm conf bit 2 */
++                        MX91_PAD_ENET1_MDIO__GPIO4_IO1                  0x11d /*Assm conf bit 1 */
++                        MX91_PAD_ENET1_MDC__GPIO4_IO0                   0x11d /*Assm conf bit 0 */
+                         MX91_PAD_ENET2_TD2__GPIO4_IO17                  0x51d  /*secure ele 1*/
+                         MX91_PAD_ENET2_TD3__GPIO4_IO16                  0x51d /*secure ele 2*/  
+                         MX91_PAD_ENET2_TX_CTL__GPIO4_IO20               0x51d /*DOUT */
+@@ -99,7 +99,7 @@
+                         MX91_PAD_ENET2_RD3__GPIO4_IO27                  0x51d /*BLE additional GPIO1 */
+                         MX91_PAD_ENET2_RX_CTL__GPIO4_IO22               0x51d /*BLE additional GPIO2 */ 
+                         MX91_PAD_SD2_DATA1__GPIO3_IO4                   0x51d
+-			MX91_PAD_SD2_DATA2__GPIO3_IO5                   0x51d
++			MX91_PAD_SD2_DATA2__GPIO3_IO5                   0x31d
+ 		 	MX91_PAD_DAP_TMS_SWDIO__GPIO3_IO29              0x51d /*BLE RTS */
+                         MX91_PAD_DAP_TCLK_SWCLK__GPIO3_IO30             0x51d /*BLE CTS */
+                 >;

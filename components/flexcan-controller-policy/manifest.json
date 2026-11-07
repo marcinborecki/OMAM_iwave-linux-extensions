@@ -1,0 +1,32 @@
+{
+  "schema": "omam.flexcan-patch.v1",
+  "srcrev": "02cf250c2e6bd375c11dae324ea145a39015d41b",
+  "vendor_patches": "all 15 meta-iwave REL3.3 patches in recipe order; no supplied patch changes these base files",
+  "patch": "0001-flexcan-controller-policy.patch",
+  "patch_sha256": "dab70839904453aca5f9f49d7a2a342389bf85a52763f67df9a5e429ab348d6b",
+  "base_sha256": {
+    "drivers/net/can/flexcan/Makefile": "230da089c0ded004ce988723b816fa56ca491857f7d46c98a5e4510551740246",
+    "drivers/net/can/flexcan/flexcan-core.c": "06ec43aea195221a14e0d54aefc347da841100481b353d8649bd4950638a22ab",
+    "drivers/net/can/flexcan/flexcan.h": "8f2cec5aede1c98dab115e593b5d42f3913daa1e0c8ca98ed38e558df6813395"
+  },
+  "files": {
+    "drivers/net/can/flexcan/flexcan-omam.c": "flexcan-omam.c",
+    "drivers/net/can/flexcan/flexcan-omam.h": "flexcan-omam.h",
+    "drivers/net/can/flexcan/flexcan-policy.h": "flexcan-policy.h",
+    "include/uapi/linux/omam_flexcan.h": "include/uapi/linux/omam_flexcan.h"
+  },
+  "result_sha256": {
+    "drivers/net/can/flexcan/Makefile": "dbcafe4345859ef279da30cb98ca8fa7b306ec6d543038590fabf4ade901cc8f",
+    "drivers/net/can/flexcan/flexcan-core.c": "e5536f3e2ba96bea42e330dbc616ac8546838be3089a0c618aced7db5a21a6b8",
+    "drivers/net/can/flexcan/flexcan.h": "a68d7672477b713211e57bd1df6772f3ea8ce12fefc437b0f6f9839beb9ccfb8",
+    "drivers/net/can/flexcan/flexcan-omam.c": "46b9527fb630bd22fb6024bd0db03935625da94171d7a4a596c0c8522877650e",
+    "drivers/net/can/flexcan/flexcan-omam.h": "ecf402548ba74f27777b7161a8ff5e210db581693d9c8599b78f45b74c01ac23",
+    "drivers/net/can/flexcan/flexcan-policy.h": "90640927bcfe66c3a55241892237848d163dcfb136e2ee17e46b7a98e55cc7fa",
+    "include/uapi/linux/omam_flexcan.h": "6630abf47d3d2b37cde4118b0d9b4cdfcd0a09ff6869d6ed377f18c5306dfa51"
+  },
+  "required_config": [
+    "CONFIG_CAN_FLEXCAN=y",
+    "CONFIG_CRYPTO_LIB_SHA256=y",
+    "CONFIG_NET=y"
+  ]
+}
