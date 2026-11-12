@@ -89,7 +89,7 @@ this documented bench supply and matching harness arrangement.
 The profile is `tch-g62h-imx91-rel3.3`. The normal-boot DTB is
 `imx91-iwg62h-prgtt.dtb`; similarly named recovery DTBs serve a different boot stage.
 The current pinned set uses kernel `6.12.34-omam-rel33-policy1` and .NET SDK
-`11.0.100-rc.3.26522.148`. Read exact identities from the actual base manifest and
+`11.0.100`. Read exact identities from the actual base manifest and
 profile rather than inferring compatibility from a filename or a generic “REL3.3” label.
 
 From the repository root, the existing public validator can check a supplied neutral

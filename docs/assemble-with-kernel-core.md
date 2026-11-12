@@ -35,7 +35,7 @@ not merely from successfully reading this guide.
 | `Image`, normal DTB, 807 native modules, two upstream IMU modules and metadata | This project's accepted public kernel-core binary release, with descriptor and source references | 809 publicly supplied module binaries plus their qualified kernel |
 | Five preserved factory modules | Exact customer's REL3.3 BSP from iWave | Restores the complete qualified 814-module set; these bytes are not in the public core archive |
 | Stock rootfs, boot container and recovery files | Exact nine-file board BSP delivery from iWave | Required board boot/recovery and userspace inputs; independent component terms apply |
-| .NET 11 RC3 SDK/runtime | Microsoft public download, pinned by this profile's SDK lock | Managed platform payload; no customer program is implied |
+| .NET 11 SDK/runtime (`11.0.100` / `11.0.0`) | Microsoft public download, pinned by this profile's SDK lock | Managed platform payload; no customer program is implied |
 | Application, accounts/access, SIM/APN and service configuration | Downstream private consumer | Turns the accepted neutral base into that consumer's prepared deployment |
 
 ```mermaid
@@ -81,7 +81,7 @@ baseline_root="$assembly_root/bsp-baseline"
 core_extract="$assembly_root/core-extracted"
 bundle_root="$core_extract/iwave-kernel-core"
 release_record="$project_root/profiles/tch-g62h-imx91-rel3.3/kernel-core-release.json"
-sdk_root="$assembly_root/dotnet-11.0.100-rc.3.26522.148-linux-arm64"
+sdk_root="$assembly_root/dotnet-11.0.100-linux-arm64"
 local_policy="$assembly_root/local-image-policy.json"
 image_root="$assembly_root/neutral-base"
 export assembly_root release_record

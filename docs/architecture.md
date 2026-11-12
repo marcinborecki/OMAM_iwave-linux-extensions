@@ -28,7 +28,7 @@ flowchart TB
     M --> Q
     R[Pinned stock rootfs and stock recovery boot inputs] --> B[Streaming neutral image composition]
     Q --> B
-    D[Pinned Linux ARM64 .NET 11 RC3 SDK] --> B
+    D[Pinned Linux ARM64 .NET 11 SDK] --> B
     N[Explicit identity and service neutralisation] --> B
     B --> A[Independent archive and software boot-connection checks]
     A --> F[Local neutral base; no private application or provisioning]
@@ -40,7 +40,7 @@ flowchart TB
 |---|---|
 | Qualified `Image` and `imx91-iwg62h-prgtt.dtb` | Kernel mechanisms and the board's actual hardware description are selected together. |
 | 807 native modules, five preserved vendor modules and two upstream IMU modules | One release-specific module set with matching symbol and dependency metadata; built-in drivers are additional code inside Image. |
-| .NET SDK `11.0.100-rc.3.26522.148` | Full ARM64 SDK under `/opt/dotnet`, with the exact RC3 shared runtimes; it is a userspace payload, not a kernel driver. |
+| .NET SDK `11.0.100` | Full ARM64 SDK under `/opt/dotnet`, with the exact `11.0.0` shared runtimes; it is a userspace payload, not a kernel driver. |
 | Neutral overlay | Clears stored connections and identity, locks password accounts, selects headless boot and disables consumers of deliberately removed configuration. |
 | Original factory protection and peripheral entrypoints | Retains battery monitor/runtime library, BLE initialization, GNSS socket activation and SSH key-generation services without adding private operational policy. |
 | Separate downstream profile | Adds its own application, release, access and deployment configuration only after validating the neutral base. |

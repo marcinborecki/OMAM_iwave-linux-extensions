@@ -1,10 +1,10 @@
 {
   "schema": "iwave.profile-qualification.v1",
   "profile": "tch-g62h-imx91-rel3.3",
-  "recorded_on": "2026-11-07",
+  "recorded_on": "2026-11-12",
   "neutral_base": {
-    "rootfs_sha256": "985064489c68b676a3d0ccfeb24bd4b31510bc06dad71f2aa764f8c1bbfcb33e",
-    "base_manifest_sha256": "97c2b035ec0b8958f2e59dc1a582690f8eb39762606cbe0cd070a207142ed35e",
+    "rootfs_sha256": "32bada4cc47679d312c5313db9c9aa35554240c7ec92f6efa1a3dc800e5c58e8",
+    "base_manifest_sha256": "52db0b89f70a913a84548c6218de25a827d4180fc4d0c6b4e9b47dd352a5b1ee",
     "kernel_release": "6.12.34-omam-rel33-policy1",
     "modules": {
       "native": 807,
@@ -12,11 +12,11 @@
       "upstream_imu": 2,
       "total": 814
     },
-    "sdk": "11.0.100-rc.3.26522.148",
-    "runtime": "11.0.0-rc.3.26522.148",
+    "sdk": "11.0.100",
+    "runtime": "11.0.0",
     "content_verification": "PASS",
     "boot_connections": "STATIC_CHECK_PASS",
-    "private_additive_consumer": "ACTUAL_COMPOSE_AND_INDEPENDENT_COMPARE_PASS"
+    "private_additive_consumer": "NOT_RUN_FOR_THIS_BASE; the 2026-11-07 RC3 base passed an actual private compose and independent compare"
   },
   "checks": {
     "native_and_kernel_tool_cases": {

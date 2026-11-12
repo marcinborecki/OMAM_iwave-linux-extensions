@@ -138,8 +138,8 @@ labels and explains what is still unknown about pin orientation and board revisi
 | .NET SDK/runtime payload | A downstream managed application needs a matching runtime/toolchain | The consumer installs its managed application separately |
 
 The current board profile pins normal-boot Device Tree `imx91-iwg62h-prgtt.dtb`,
-Linux `6.12.34-omam-rel33-policy1`, SDK `11.0.100-rc.3.26522.148` and matching
-.NET/ASP.NET RC3 runtimes. Release/ABI names containing `omam` are retained compatibility
+Linux `6.12.34-omam-rel33-policy1`, SDK `11.0.100` and matching
+.NET/ASP.NET `11.0.0` runtimes. Release/ABI names containing `omam` are retained compatibility
 identifiers, not evidence of a customer agent or its configuration being installed.
 
 The FlexCAN IP uses the `fsl,imx93-flexcan` compatible string on this i.MX91 board.

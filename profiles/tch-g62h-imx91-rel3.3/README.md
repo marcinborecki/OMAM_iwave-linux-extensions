@@ -12,9 +12,10 @@ chooses vehicle decoding, capture/sample policy, operational energy decisions an
 its service connection through the provided interfaces.
 
 The current qualified set uses Linux `6.12.34-omam-rel33-policy1` and .NET SDK
-`11.0.100-rc.3.26522.148` for Linux ARM64. The SDK and runtime are deliberately pinned
-to the existing RC3 payload. Official .NET 11 channel metadata checked on 2026-11-07 identifies RC3 as
-the latest published RC at that check; sdk-release-verification.json records it.
+`11.0.100` for Linux ARM64, with runtime `11.0.0`: the .NET 11 general-availability release.
+Official .NET 11 release metadata checked on 2026-11-11 identifies it as the latest release, and its
+SHA-512 was verified against the downloaded archive; sdk-release-verification.json records it.
+It replaces the RC3 pin `11.0.100-rc.3.26522.148` of 2026-11-07.
 `dotnet-sdk.lock.json` records the Microsoft download URL and SHA512;
 `image-policy.json` binds the actual SDK tree and qualified kernel manifest.
 The historical `omam` kernel release suffix and module/UAPI names identify stable
@@ -104,7 +105,7 @@ python3 tools/image/build_base.py \
   --vendor-manifest .local/vendor-manifest.json \
   --kernel-root .local/kernel-set \
   --kernel-receipt /absolute/path/to/kernel-build-receipt.json \
-  --sdk .local/sdk/dotnet-11.0.100-rc.3.26522.148-linux-arm64 \
+  --sdk .local/sdk/dotnet-11.0.100-linux-arm64 \
   --scratch-root /tmp \
   --output /tmp/iwave-neutral-base \
   --dry-run

@@ -40,7 +40,7 @@ baseline_root="$assembly_root/bsp-baseline"
 core_extract="$assembly_root/core-extracted"
 bundle_root="$core_extract/iwave-kernel-core"
 release_record="$project_root/profiles/tch-g62h-imx91-rel3.3/kernel-core-release.json"
-sdk_root="$assembly_root/dotnet-11.0.100-rc.3.26522.148-linux-arm64"
+sdk_root="$assembly_root/dotnet-11.0.100-linux-arm64"
 local_policy="$assembly_root/local-image-policy.json"
 image_root="$assembly_root/neutral-base"
 export assembly_root release_record
@@ -353,8 +353,8 @@ mkdir -p .local/sdk
 python3 -B tools/image/sdk_payload.py stage \
   --manifest profiles/tch-g62h-imx91-rel3.3/dotnet-sdk.lock.json \
   --cache-dir .local/downloads/dotnet \
-  --output-dir .local/sdk/dotnet-11.0.100-rc.3.26522.148-linux-arm64
-sdk_root="$project_root/.local/sdk/dotnet-11.0.100-rc.3.26522.148-linux-arm64"
+  --output-dir .local/sdk/dotnet-11.0.100-linux-arm64
+sdk_root="$project_root/.local/sdk/dotnet-11.0.100-linux-arm64"
 local_policy="$project_root/.local/rebuilt-image-policy.json"
 python3 -B tools/image/qualify_profile.py \
   --vendor-root "$vendor_root" --vendor-manifest "$baseline_root/inputs/manifest.json" \

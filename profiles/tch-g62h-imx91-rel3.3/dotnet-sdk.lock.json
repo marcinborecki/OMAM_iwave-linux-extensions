@@ -3,9 +3,9 @@
   "rid": "linux-arm64",
   "sdks": [
     {
-      "version": "11.0.100-rc.3.26522.148",
-      "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/11.0.100-rc.3.26522.148/dotnet-sdk-11.0.100-rc.3.26522.148-linux-arm64.tar.gz",
-      "sha512": "e8788cba187792a64bdc5493da4c29066070f3996b0d7899d4f4ace2f76f7f101217e88834522394aa00e306f1c9506faf74f5cd2379fbee314b00ac8f34bb5b",
+      "version": "11.0.100",
+      "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/11.0.100/dotnet-sdk-11.0.100-linux-arm64.tar.gz",
+      "sha512": "cfa248bb1377606e868602fb5b4d66fa16b7546156593937d1982f7f2142e6ded76d71c4a26efdab99f87c46ab40c3c672ab1b57ef7fa25449efe5b140a55af4",
       "metadata_url": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/11.0/releases.json",
       "rid": "linux-arm64"
     }

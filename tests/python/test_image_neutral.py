@@ -92,7 +92,7 @@ def image(tmp_path):
     (sdk / 'dotnet').write_bytes(b'synthetic SDK host')
     (sdk / 'dotnet').chmod(0o755)
     (sdk / 'sdk-payload-report.json').write_text(json.dumps({'schema_version': 1, 'rid': 'linux-arm64',
-        'host_from_sdk': '11.0.100-rc.3.26522.148', 'tree_sha256': tree_sha256(sdk)}))
+        'host_from_sdk': '11.0.100', 'tree_sha256': tree_sha256(sdk)}))
     kernel_root = tmp_path / 'kernel'
     release = '6.12.34-omam-neutral-test'
     outputs = {n: write_file(kernel_root, n, ('qualified ' + n).encode()) for n in

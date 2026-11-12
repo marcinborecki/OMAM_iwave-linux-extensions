@@ -36,7 +36,7 @@ flowchart TB
 | Current public Git checkout | Build, preparation, qualification and image tools; component patches; profile locks; tests and instructions. | Use the current default-branch checkout and keep its code/profile files unchanged during one build. |
 | Published source release | Exact preferred Linux tree, board additions, applied vendor/CAN/charger changes, upstream IMU C/headers, configuration, per-file manifest and original notices. | Download the asset named in `source-release.json`, verify size/SHA256 and extract it. Its `extensions/` directory is a historical support snapshot; run current tools from the Git checkout. |
 | Native ARM64 toolchain | Nine official Ubuntu HTTPS package URLs, exact sizes/SHA256 and compiler identity in `build-toolchain.json`. | Download and verify the packages, then extract them into a new local prefix. Host libraries and normal build prerequisites must be compatible. |
-| .NET SDK | Official Microsoft URL and SHA512 in `dotnet-sdk.lock.json`; public staging tool. | Stage the exact Linux ARM64 SDK. The profile currently pins .NET 11 RC3. |
+| .NET SDK | Official Microsoft URL and SHA512 in `dotnet-sdk.lock.json`; public staging tool. | Stage the exact Linux ARM64 SDK. The profile currently pins the .NET 11 GA SDK `11.0.100`. |
 | TCH REL3.3 BSP | Nine exact file identities in `vendor-files.lock.json`; the binaries themselves are supplied separately. | Obtain the matching delivery through your iWave/support channel and retain its `Firmware/`, `Linux/` and UUU recipe layout. No public BSP download is promised here. |
 | Five factory external modules | Their exact hashes and public GPL source candidates are recorded. Preparation extracts the five binaries from the supplied stock rootfs for local qualification. | Resolve effective corresponding-source completeness before binary distribution; candidate project URLs alone do not establish what the factory build used. |
 | Whole-image publication | Source and redistribution inventory identifies remaining evidence and terms per component. | Resolve those release-specific items before publishing a complete firmware image. Local preparation or compilation is not redistribution clearance. |
@@ -277,8 +277,8 @@ mkdir -p .local/sdk
 python3 -B tools/image/sdk_payload.py stage \
   --manifest profiles/tch-g62h-imx91-rel3.3/dotnet-sdk.lock.json \
   --cache-dir .local/downloads/dotnet \
-  --output-dir .local/sdk/dotnet-11.0.100-rc.3.26522.148-linux-arm64
-sdk_root="$project_root/.local/sdk/dotnet-11.0.100-rc.3.26522.148-linux-arm64"
+  --output-dir .local/sdk/dotnet-11.0.100-linux-arm64
+sdk_root="$project_root/.local/sdk/dotnet-11.0.100-linux-arm64"
 local_policy="$project_root/.local/rebuilt-image-policy.json"
 
 python3 -B tools/image/qualify_profile.py \

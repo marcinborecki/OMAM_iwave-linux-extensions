@@ -29,8 +29,8 @@
       "sha256": "be980967e0270354fec245dfb1901cd3aba0c102fcd666b2245f8ad7511ef9d7"
     }
   },
-  "sdk_tree_sha256": "fdd2e5694cff09a503cbc48373b8056826835a0d0db1f3517a0da7882927cd3e",
-  "sdk_host_version": "11.0.100-rc.3.26522.148",
+  "sdk_tree_sha256": "445e46f3f6e5ca3ba66f0529f8f24128d74993c06244e280c7095b178bfe4e50",
+  "sdk_host_version": "11.0.100",
   "qualification": "PASS_BUILD_AND_STATIC_ABI",
   "physical_acceptance": "NOT_RUN"
 }

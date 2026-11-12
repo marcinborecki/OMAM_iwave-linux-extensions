@@ -1,11 +1,20 @@
 {
-  "schema": "iwave.dotnet-rc-verification.v1",
-  "checked_date": "2026-11-07",
+  "schema": "iwave.dotnet-release-verification.v1",
+  "checked_date": "2026-11-11",
   "metadata": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/11.0/releases.json",
-  "latest_sdk": "11.0.100-rc.3.26522.148",
-  "latest_release_date": "2026-10-25",
-  "runtime": "11.0.0-rc.3.26522.148",
+  "release": "11.0.0",
+  "release_date": "2026-11-10",
+  "support_phase": "active",
+  "release_type": "sts",
+  "latest_sdk": "11.0.100",
+  "runtime": "11.0.0",
+  "aspnetcore_runtime": "11.0.0",
+  "csharp_version": "15.0",
   "rid": "linux-arm64",
-  "sha512": "e8788cba187792a64bdc5493da4c29066070f3996b0d7899d4f4ace2f76f7f101217e88834522394aa00e306f1c9506faf74f5cd2379fbee314b00ac8f34bb5b",
-  "selection": "Latest published .NET 11 RC in official metadata; existing profile pin unchanged"
+  "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/11.0.100/dotnet-sdk-11.0.100-linux-arm64.tar.gz",
+  "sha512": "cfa248bb1377606e868602fb5b4d66fa16b7546156593937d1982f7f2142e6ded76d71c4a26efdab99f87c46ab40c3c672ab1b57ef7fa25449efe5b140a55af4",
+  "archive_bytes": 203411983,
+  "archive_sha512_verified": "downloaded archive SHA-512 equals the official metadata hash; the public staging tool verified it again before extraction",
+  "staged_tree_sha256": "445e46f3f6e5ca3ba66f0529f8f24128d74993c06244e280c7095b178bfe4e50",
+  "selection": "General-availability .NET 11 release in official metadata; replaces the RC3 pin 11.0.100-rc.3.26522.148 selected on 2026-11-07"
 }

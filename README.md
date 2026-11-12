@@ -208,7 +208,7 @@ driver becomes an operational feature when its consumer configures and observes 
 | Linux Image and Device Tree | Pinned vendor source plus fifteen ordered vendor patches. | Integrates the FlexCAN and charger changes with the actual board configuration. |
 | Kernel modules and dependency indexes | 807 native, five retained factory external modules and two external upstream IMU modules. | Qualified together against the same kernel; built-in drivers also reside inside Image. |
 | Root filesystem and base services | Stock Yocto userspace, utilities, modem/sensor support and factory battery protection. | Applies a declared neutralisation overlay and preserves required service dependencies. |
-| .NET 11 RC3 | Full Linux ARM64 SDK and shared runtimes. | Pinned by official download and actual staged-tree hashes. |
+| .NET 11 | Full Linux ARM64 SDK and shared runtimes. | Pinned by official download and actual staged-tree hashes. |
 | Installation-specific application and configuration | Supplied by a separate downstream project. | Added to a new image by its private profile, preserving the accepted kernel/SDK identity. |
 
 The project changes specific platform boundaries that blocked the intended use:
@@ -249,9 +249,9 @@ actual image you distribute. The stock list alone is not a final-image SBOM.
 | Kernel source | linux-imx9-iwave, revision `02cf250c2e6bd375c11dae324ea145a39015d41b`, then all 15 vendor patches in their recorded order |
 | Kernel/module candidate | `6.12.34-omam-rel33-policy1`; 807 native modules, five preserved stock modules and two matching upstream IMU modules |
 | Device Tree | `imx91-iwg62h-prgtt.dtb` |
-| SDK | .NET `11.0.100-rc.3.26522.148`, Linux ARM64 |
-| Runtime | Microsoft.NETCore.App and Microsoft.AspNetCore.App `11.0.0-rc.3.26522.148` |
-| Latest-RC check | Official Microsoft channel metadata checked on 2026-11-07; RC3 is the latest published .NET 11 RC |
+| SDK | .NET `11.0.100`, Linux ARM64 |
+| Runtime | Microsoft.NETCore.App and Microsoft.AspNetCore.App `11.0.0` |
+| Release check | Official Microsoft .NET 11 release metadata checked on 2026-11-11: SDK `11.0.100` and runtime `11.0.0` are the general-availability release of 2026-11-10; it replaces the earlier RC3 pin `11.0.100-rc.3.26522.148` |
 | Evidence boundary | Native behavior tests, source/hash checks, static module ABI and archive-content checks; fresh physical boot, CAN traffic and power/wake qualification are separate |
 
 Matching CPU architecture alone is insufficient. Different carrier revisions,
@@ -503,7 +503,7 @@ baseline_root="$assembly_root/bsp-baseline"
 core_extract="$assembly_root/core-extracted"
 bundle_root="$core_extract/iwave-kernel-core"
 release_record="$project_root/profiles/tch-g62h-imx91-rel3.3/kernel-core-release.json"
-sdk_root="$assembly_root/dotnet-11.0.100-rc.3.26522.148-linux-arm64"
+sdk_root="$assembly_root/dotnet-11.0.100-linux-arm64"
 local_policy="$assembly_root/local-image-policy.json"
 image_root="$assembly_root/neutral-base"
 export assembly_root release_record
@@ -883,8 +883,8 @@ mkdir -p .local/sdk
 python3 -B tools/image/sdk_payload.py stage \
   --manifest profiles/tch-g62h-imx91-rel3.3/dotnet-sdk.lock.json \
   --cache-dir .local/downloads/dotnet \
-  --output-dir .local/sdk/dotnet-11.0.100-rc.3.26522.148-linux-arm64
-sdk_root="$project_root/.local/sdk/dotnet-11.0.100-rc.3.26522.148-linux-arm64"
+  --output-dir .local/sdk/dotnet-11.0.100-linux-arm64
+sdk_root="$project_root/.local/sdk/dotnet-11.0.100-linux-arm64"
 local_policy="$project_root/.local/rebuilt-image-policy.json"
 
 python3 -B tools/image/qualify_profile.py \
@@ -1158,9 +1158,10 @@ Their `--help` and source argument parsers identify the required compiler/source
 paths. Run with an owned temporary directory and a bounded process supervisor;
 never leave a replay, compiler, test service or child process behind.
 
-The profile's SDK pin was compared with official .NET 11 channel metadata. A future
-newer RC is a maintenance change: verify its official hash, stage it, renew the
-SDK tree/image policy and relevant tests, then build a new base. Rebuilding an
+The profile's SDK pin was compared with official .NET 11 release metadata. A future
+newer SDK, such as a servicing release, is a maintenance change: verify its official hash, stage it, renew the
+SDK tree/image policy and relevant tests, then build a new base. The move from RC3 to the
+GA SDK `11.0.100` on 2026-11-11 followed exactly these steps; see below. Rebuilding an
 existing profile keeps its exact pin. It must not silently download a different
 SDK, upgrade a kernel or weaken a compatibility check.
 
@@ -1171,6 +1172,13 @@ passed retained-entry comparison. Its neutral rootfs SHA-256 is
 The profile qualification record separates those observations from the reused
 original full-kernel build and the unrun physical checks. No boot, CAN traffic,
 current-consumption, wake or sensor-sample result is implied by archive acceptance.
+
+The 2026-11-11 SDK maintenance staged the official GA SDK `11.0.100` (SHA-512 verified),
+renewed `image-policy.json` with its actual staged-tree hash, and on 2026-11-12 composed a new local
+neutral base with the unchanged qualified kernel and BSP inputs (rootfs SHA-256
+`32bada4cc47679d312c5313db9c9aa35554240c7ec92f6efa1a3dc800e5c58e8`). Independent validation of that base
+passed against the renewed policy; `qualification.json` records its rootfs and manifest hashes.
+The kernel core and its release assets are unchanged. Physical checks were again not run.
 
 ## Adding another board
 

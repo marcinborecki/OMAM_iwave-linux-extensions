@@ -151,8 +151,9 @@ Independent comparison must prove that every retained base entry, including SDK,
 kernel modules, indexes and boot inputs, still has its bound identity. This prevents
 a private image recipe from quietly turning into a second platform implementation.
 
-The latest-RC selection is frozen by the SDK lock and verification record, not by
-a floating installer URL. On 2026-11-07 Microsoft's official .NET 11 channel metadata
-identified SDK `11.0.100-rc.3.26522.148` and runtime `11.0.0-rc.3.26522.148`.
+The SDK selection is frozen by the SDK lock and verification record, not by
+a floating installer URL. On 2026-11-11 Microsoft's official .NET 11 release metadata
+identified the GA SDK `11.0.100` and runtime `11.0.0` (released 2026-11-10); they replace
+the RC3 pin `11.0.100-rc.3.26522.148` selected on 2026-11-07.
 Changing that input later requires a new payload identity and appropriate renewed
 image/consumer checks.
